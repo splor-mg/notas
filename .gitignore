@@ -1,0 +1,12 @@
+# General files
+.env
+
+# R files
+.Rhistory
+.RData
+.Rproj.user/
+/.quarto/
+
+
+# Python files
+venv/
