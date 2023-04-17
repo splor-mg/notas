@@ -6,7 +6,8 @@
 .RData
 .Rproj.user/
 /.quarto/
-
+_site/
+_freeze/
 
 # Python files
 venv/
