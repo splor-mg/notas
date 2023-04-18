@@ -1,0 +1,13 @@
+project:
+  type: website
+
+website:
+  repo-url: https://github.com/splor-mg/notas
+  repo-actions: [edit, issue]
+  navbar:
+    left:
+    - href: index.md
+      text: Home
+    right:
+      - icon: github
+        href: https://github.com/splor-mg/notas

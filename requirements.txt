@@ -1,0 +1,4 @@
+jupyter==1.0.0
+pandas==2.0.0
+frictionless==5.10.5
+matplotlib==3.7.1

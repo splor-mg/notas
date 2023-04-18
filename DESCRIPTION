@@ -1,0 +1,12 @@
+Package: notas
+Title: Notetaking
+Version: 0.1.0
+Authors@R: 
+    person("Francisco", "Alves", , "francisco.junior@planejamento.mg.gov.br", role = c("aut", "cre"))
+Imports:
+    renv,
+    RSQLite,
+    tidyverse,
+    data.table,
+    rmarkdown
+Encoding: UTF-8
