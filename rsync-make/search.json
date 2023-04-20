@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Base de conhecimento - Assessoria de Dados SPLOR",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\nDescription\n\n\nCategories\n\n\n\n\n\n\n\n\nmake e rsync para validações de recursos com alterações\n\n\nFrancisco\n\n\n\n\n\nfrictionless,cli\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "20230420T114416/index.html",
+    "href": "20230420T114416/index.html",
+    "title": "make e rsync para validações de recursos com alterações",
+    "section": "",
+    "text": "No gerenciamento de data packages que possuem múltiplos recursos é interessante que as validações sejam executadas somente para os recursos que tiveram alguma modificação em seus dados ou metadados.\nOs programas make e rsync podem ser utilizados para obter esse comportamento.\nUm exemplo real pode ser visto no repo splor-mg/ppag2023-dadosmg."
+  }
+]
