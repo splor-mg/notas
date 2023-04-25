@@ -11,6 +11,6 @@
     "href": "20230420T114416/index.html",
     "title": "make e rsync para validações de recursos com alterações",
     "section": "",
-    "text": "No gerenciamento de data packages que possuem múltiplos recursos é interessante que as validações sejam executadas somente para os recursos que tiveram alguma modificação em seus dados ou metadados.\nOs programas make e rsync podem ser utilizados para obter esse comportamento.\nUm exemplo real pode ser visto no repo splor-mg/ppag2023-dadosmg."
+    "text": "Quando executamos na linha de comando\nfrictionless validate datapackage.json\ntodos os recursos do data package serão validados. A opção --resource-name permite a validação de um único recurso\nfrictionless validate --resource-name resource_name datapackage.json\nNo gerenciamento de data packages que possuem múltiplos recursos é interessante que as validações sejam executadas somente para os recursos que tiveram alguma modificação em seus dados ou metadados.\nOs programas make e rsync podem ser utilizados para obter esse comportamento.\nUm exemplo real pode ser visto no repo splor-mg/ppag2023-dadosmg.\n\nmake - static pattern rules\nrsync --checksum"
   }
 ]
