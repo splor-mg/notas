@@ -4,6 +4,8 @@ Esse repositório armazena a base de conhecimento da Assessoria de Dados da [Sub
 
 Organização do conhecimento porque torna explícito o conhecimento tácito dos servidores e disseminação porque as notas são lidas por todos antes de serem incorporadas a [base de conhecimento permanente](https://splor-mg.github.io/notas/main).
 
+Além disso, ajuda a trazer visibilidade para atores externos do esforço dedicado a tarefas intensivas em pesquisa e que não produzem uma entrega tangível (eg. leitura de um termo de referência, pesquisa sobre UI design patterns para tabelas, pesquisa sobre mocking em testes unitários, pesquisa sobre licenças de dados).
+
 ## Instalação e configuração
 
 Essa instalação é necessária somente para a visualização local das notas.
