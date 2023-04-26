@@ -1,9 +1,23 @@
 [
   {
+    "objectID": "20231804T160439/index.html",
+    "href": "20231804T160439/index.html",
+    "title": "Relacionamento entre bases no relatório operacional",
+    "section": "",
+    "text": "As bases que compõem o relatório operacional são provenientes do armazém B.O, que é alimentado por diferentes fluxos dos sistemas transacionais SIAFI e SIAD, e também pelas bases de Restimativa da Despesa e Receita, de atualização pela DCMEFO e DCAF, que se encontra compartilhada atualmente no OneDrive.\nEssas bases contêm diferentes granularidades (dimensões) nos dados entre elas, em razão de especificidades inerentes a natureza dos dados e ao fluxo a que pertencem, o que exige do usuário desenvolvedor do qlikview conhecimento intermediário da ferramenta para o relacionamento correto das bases na ferramenta.\nO objetivo desta nota é apresentar as principais particularidades da granulariade de cada uma das bases, bem como o método encontrado para contornar essa situação no qlikview."
+  },
+  {
+    "objectID": "20231804T160439/index.html#métodos-de-relacionamento-entre-as-bases",
+    "href": "20231804T160439/index.html#métodos-de-relacionamento-entre-as-bases",
+    "title": "Relacionamento entre bases no relatório operacional",
+    "section": "Métodos de relacionamento entre as bases",
+    "text": "Métodos de relacionamento entre as bases\n\nMétodo da concatenação (concatenate)\n(em elaboração: inserir referência, ilustrações, exemplo real)\nA forma mais intuitiva, geralmente utilizada por usuários desenvolvedores iniciantes do qlikview, seria relacionar todas bases por meio do comando concatenate no script do aplicativo. Isso resultaria em uma tabela única, contendo todas as informações de todas as bases. Contudo, isso traz alguns inconvenientes na criação de visualização dos dados na ferramenta.\nExemplo:\nAo se filtrar, por exemplo, pela classificação orçamentária grupo de despesa, os painéis que trazerem dados das bases onde esse dado existe,retornarão corretamente. Entretanto, o painel com dados da Arrecadação da receita retornarão nulo, uma vez que inexiste esse no fluxo da arrecadação da receita. Essa situação ocorre em qualquer filtro que se faça em um parâmetro que inexiste em alguma das bases.\ninserir visualizações\n\n\nMétodo linktable\n(em elaboração: ver texto, inserir referência, ilustrações, exemplo real)\nExplicar o que se espera…\nA forma encontrada para se relacionar as bases foi a adaptação do método linktable(inserir link do tutorial). Por meio de criação da coluna de chaves em todas elas contendo todas os parâmetros comuns a ao menos uma das bases. Resumidamente, o linktable resulta na concatenação em uma tabela de todas as dimensões de todas as bases. Resultando em uma única tabela com todas as dimensões e chaves para se ligar às tabelas fato. Ou seja, todas classificações orçamentárias e demais dimensões vão estar nesta grande tabela chamada “link”, e também as chaves, que correspondem a uma coluna resultado da concatenação de todas as colunas dimensão. Nas tabelas fato (bases Execução, Crédito, Restos a Pagar, Cota Orçamentária) vão restar somente a chave para se ligar a tabela link e os dados da tabela fato (Crédito Inicial e Autorizado, Empenhado, Liquidado, Pago, Cota Aprovada Líquida, Receita Arrecadada, e etc.)\n(Inserir visualizações) (Inserir parte do script)"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Base de conhecimento - Assessoria de Dados SPLOR",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\nDescription\n\n\nCategories\n\n\n\n\n\n\n\n\nDesafios relatório operacional\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\nDescription\n\n\nCategories\n\n\n\n\n\n\nundefined\n\n\nRelacionamento entre bases no relatório operacional\n\n\n\n\n\n\n\n\nundefined\n\n\n\n\n\n\nNo matching items"
   }
 ]
