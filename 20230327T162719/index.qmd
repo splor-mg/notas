@@ -1,0 +1,24 @@
+---
+title: non equi joins
+author: Francisco
+date: 2023-03-27
+---
+
+No conjunto de dados do [matriz-fonte-stn-dadosmg](https://github.com/splor-mg/matriz-fonte-stn-dadosmg) o schema do recurso `fonte_stn` que armazena as descrições e interpretações da fonte de recurso da STN é 
+
+| codigo | descricao   | interpretacao               | dt_inicio_vigencia | dt_fim_vigencia |
+|--------|-------------|-----------------------------|--------------------|-----------------|
+| 1      | Lorem Ipsum | dolor sit amet              | 0001-01-01         | 2023-02-01      |
+| 1      | Lorem Ipsum | consectetur adipiscing elit | 2023-02-01         | 9999-12-01      |
+
+Essa estrutura é conveniente porque permite a realização de consultas diversas sobre as classificações. Alguns exemplos:
+
+## Classificações vigentes atualmente
+
+```{r}
+
+```
+
+## Links
+
+- [The unequalled joy of non-equi joins · Tea & Stats](https://selbydavid.com/2021/02/13/joins/)
