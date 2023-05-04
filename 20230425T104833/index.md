@@ -108,6 +108,6 @@ which will show a summary of schema, metadata, and data changes between you curr
 
 [^20230425T102524]: As fontes de dados podem ser data packages ou conjuntos de dados do portal https://dados.mg.gov.br/ que possuem a propriedade `resources_ids` com o mapeamento entre recursos do data package e do conjunto de dados
 
-[^20230425T111627]: Dereferenced
+[^20230425T111627]: See https://github.com/frictionlessdata/framework/issues/1449
 
 [^20230425T112806]: We don't use the upstream `package.name` because it could change and break lineage between related data packages.
