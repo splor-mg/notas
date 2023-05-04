@@ -18,7 +18,7 @@
     "href": "20230425T104833/index.html#footnotes",
     "title": "Data package manager (dpm)",
     "section": "Footnotes",
-    "text": "Footnotes\n\n\nAs fontes de dados podem ser data packages ou conjuntos de dados do portal https://dados.mg.gov.br/ que possuem a propriedade resources_ids com o mapeamento entre recursos do data package e do conjunto de dados↩︎\nDereferenced↩︎\nWe don’t use the upstream package.name because it could change and break lineage between related data packages.↩︎"
+    "text": "Footnotes\n\n\nAs fontes de dados podem ser data packages ou conjuntos de dados do portal https://dados.mg.gov.br/ que possuem a propriedade resources_ids com o mapeamento entre recursos do data package e do conjunto de dados↩︎\nSee https://github.com/frictionlessdata/framework/issues/1449↩︎\nWe don’t use the upstream package.name because it could change and break lineage between related data packages.↩︎"
   },
   {
     "objectID": "index.html",
