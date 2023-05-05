@@ -6,18 +6,82 @@ date: 2023-03-27
 
 No conjunto de dados do [matriz-fonte-stn-dadosmg](https://github.com/splor-mg/matriz-fonte-stn-dadosmg) o schema do recurso `fonte_stn` que armazena as descrições e interpretações da fonte de recurso da STN é 
 
-| codigo | descricao   | interpretacao               | dt_inicio_vigencia | dt_fim_vigencia |
-|--------|-------------|-----------------------------|--------------------|-----------------|
-| 1      | Lorem Ipsum | dolor sit amet              | 0001-01-01         | 2023-02-01      |
-| 1      | Lorem Ipsum | consectetur adipiscing elit | 2023-02-01         | 9999-12-01      |
+```{r,}
+#| echo: false
+library(data.table); library(knitr)
+classificador = fread("classificador.csv")
+execucao <- fread("execucao.csv")
+kable(classificador[order(codigo)])
+```
 
 Essa estrutura é conveniente porque permite a realização de consultas diversas sobre as classificações. Alguns exemplos:
 
-## Classificações vigentes atualmente
+## Necessidades de informação
+
+### Classificações vigentes atualmente
+
+Essa consulta representa a [tabela de classificação publicada atualmente](https://docs.google.com/spreadsheets/d/1et_q4xTH2p6umWduHRZP-lFDXXK0Q6kN/edit#gid=1636393178) pela DCPPN
 
 ```{r}
-
+classificador[
+    dt_fim_vigencia == "9999-12-31"
+][order(codigo)] |> kable()
 ```
+
+### Classificações vigentes em uma data específica
+
+```{r}
+classificador["2023-02-01" >= dt_inicio_vigencia & "2023-02-01" < dt_fim_vigencia][order(codigo)] |> kable()
+```
+
+Vale ressaltar que como a vigência é especificada como um intervalo semi-fechado $[a, b)$, o seguinte filtro gera resultados incorretos
+
+```{r}
+classificador["2023-02-01" >= dt_inicio_vigencia & "2023-02-01" <= dt_fim_vigencia][order(codigo)] |> kable()
+```
+
+### Classificações vigentes na inicialização do classificador
+
+```{r}
+classificador[dt_inicio_vigencia == "0001-01-01"] |> kable()
+```
+
+### Histórico de alterações de uma classificação
+
+```{r}
+classificador[codigo == 500][order(-dt_fim_vigencia)] |> kable()
+```
+
+### Número de alterações sofridas por determinada classificação
+
+```{r}
+classificador[, .N, codigo] |> kable()
+```
+
+### Cruzamento para recuperação das informações cadastrais
+
+```{r}
+desc <- classificador[
+  execucao, 
+  .(nr_emp, dt_emp, codigo, descricao, valor), 
+  on = .(codigo, dt_inicio_vigencia <= dt_emp, dt_fim_vigencia > dt_emp)
+]
+desc |> kable()
+```
+
+## Necessidades não atendidas
+
+- Imagine que em 04/05/2023 a DCAF fez o cruzamento de dados da seção anterior. No dia seguinte a DCPPN fez uma alteração no classificador da despesa alterando a descrição da fonte 503 "Recursos Diretamente Arrecadados" para "RDA". Sem ter que realizar novamente o cruzamento de todas as linhas, como a DCAF pode identificar essa modificação realizada pela DCPPN?
+
+- Como garantir ou validar que a data de fim de vigência de uma classificação seja igual a data de inicio de vigência de outra classificação?
+
+- Classificação deve ser utilizada na LOA mas não será utilizada durante a execução
+
+- Quem alterou a descrição da fonte 503 "Recursos Diretamente Arrecadados" para "RDA"? Porque essa alteração foi realizada?
+
+- Em uma data específica eu fiz a classificação de um empenho na fonte 501. Hoje, quais são as classificações possíveis para esse empenho?
+
+- Qual o mapeamento entre as classificações do SIAFI e GRP?
 
 ## Links
 
