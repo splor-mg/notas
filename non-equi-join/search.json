@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "20230327T162719/index.html",
+    "href": "20230327T162719/index.html",
+    "title": "non equi joins",
+    "section": "",
+    "text": "No conjunto de dados do matriz-fonte-stn-dadosmg o schema do recurso fonte_stn que armazena as descrições e interpretações da fonte de recurso da STN é\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Ordinários\n1-01-01\n2023-02-01\n\n\n500\nRecursos Não vinculados\n2023-02-01\n2023-05-01\n\n\n500\nRecursos Não Vinculados de Impostos\n2023-05-01\n9999-12-31\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n503\nRecursos Diretamente Arrecadados\n2023-02-01\n9999-12-31\nEssa estrutura é conveniente porque permite a realização de consultas diversas sobre as classificações. Alguns exemplos:"
+  },
+  {
+    "objectID": "20230327T162719/index.html#necessidades-de-informação",
+    "href": "20230327T162719/index.html#necessidades-de-informação",
+    "title": "non equi joins",
+    "section": "Necessidades de informação",
+    "text": "Necessidades de informação\n\nClassificações vigentes atualmente\nEssa consulta representa a tabela de classificação publicada atualmente pela DCPPN\n\nclassificador[\n    dt_fim_vigencia == \"9999-12-31\"\n][order(codigo)] |&gt; kable()\n\n\n\n\n\n\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Não Vinculados de Impostos\n2023-05-01\n9999-12-31\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n503\nRecursos Diretamente Arrecadados\n2023-02-01\n9999-12-31\n\n\n\n\n\n\n\nClassificações vigentes em uma data específica\n\nclassificador[\"2023-02-01\" &gt;= dt_inicio_vigencia & \"2023-02-01\" &lt; dt_fim_vigencia][order(codigo)] |&gt; kable()\n\n\n\n\n\n\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Não vinculados\n2023-02-01\n2023-05-01\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n503\nRecursos Diretamente Arrecadados\n2023-02-01\n9999-12-31\n\n\n\n\n\nVale ressaltar que como a vigência é especificada como um intervalo semi-fechado \\([a, b)\\), o seguinte filtro gera resultados incorretos\n\nclassificador[\"2023-02-01\" &gt;= dt_inicio_vigencia & \"2023-02-01\" &lt;= dt_fim_vigencia][order(codigo)] |&gt; kable()\n\n\n\n\n\n\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Ordinários\n1-01-01\n2023-02-01\n\n\n500\nRecursos Não vinculados\n2023-02-01\n2023-05-01\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n503\nRecursos Diretamente Arrecadados\n2023-02-01\n9999-12-31\n\n\n\n\n\n\n\nClassificações vigentes na inicialização do classificador\n\nclassificador[dt_inicio_vigencia == \"0001-01-01\"] |&gt; kable()\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Ordinários\n1-01-01\n2023-02-01\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n\n\n\n\n\nHistórico de alterações de uma classificação\n\nclassificador[codigo == 500][order(-dt_fim_vigencia)] |&gt; kable()\n\n\n\n\n\n\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Não Vinculados de Impostos\n2023-05-01\n9999-12-31\n\n\n500\nRecursos Não vinculados\n2023-02-01\n2023-05-01\n\n\n500\nRecursos Ordinários\n1-01-01\n2023-02-01\n\n\n\n\n\n\n\nNúmero de alterações sofridas por determinada classificação\n\nclassificador[, .N, codigo] |&gt; kable()\n\n\n\n\ncodigo\nN\n\n\n\n\n500\n3\n\n\n501\n1\n\n\n503\n1\n\n\n\n\n\n\n\nCruzamento para recuperação das informações cadastrais\n\ndesc &lt;- classificador[\n  execucao, \n  .(nr_emp, dt_emp, codigo, descricao, valor), \n  on = .(codigo, dt_inicio_vigencia &lt;= dt_emp, dt_fim_vigencia &gt; dt_emp)\n]\ndesc |&gt; kable()\n\n\n\n\nnr_emp\ndt_emp\ncodigo\ndescricao\nvalor\n\n\n\n\n1\n2023-01-01\n500\nRecursos Ordinários\n5.0\n\n\n2\n2023-01-01\n501\nRecursos Vinculados\n10.0\n\n\n3\n2023-02-01\n500\nRecursos Não vinculados\n7.5\n\n\n4\n2022-12-01\n503\nNA\n12.0"
+  },
+  {
+    "objectID": "20230327T162719/index.html#necessidades-não-atendidas",
+    "href": "20230327T162719/index.html#necessidades-não-atendidas",
+    "title": "non equi joins",
+    "section": "Necessidades não atendidas",
+    "text": "Necessidades não atendidas\n\nImagine que em 04/05/2023 a DCAF fez o cruzamento de dados da seção anterior. No dia seguinte a DCPPN fez uma alteração no classificador da despesa alterando a descrição da fonte 503 “Recursos Diretamente Arrecadados” para “RDA”. Sem ter que realizar novamente o cruzamento de todas as linhas, como a DCAF pode identificar essa modificação realizada pela DCPPN?\nComo garantir ou validar que a data de fim de vigência de uma classificação seja igual a data de inicio de vigência de outra classificação?\nClassificação deve ser utilizada na LOA mas não será utilizada durante a execução\nQuem alterou a descrição da fonte 503 “Recursos Diretamente Arrecadados” para “RDA”? Porque essa alteração foi realizada?\nEm uma data específica eu fiz a classificação de um empenho na fonte 501. Hoje, quais são as classificações possíveis para esse empenho?\nQual o mapeamento entre as classificações do SIAFI e GRP?"
+  },
+  {
+    "objectID": "20230327T162719/index.html#links",
+    "href": "20230327T162719/index.html#links",
+    "title": "non equi joins",
+    "section": "Links",
+    "text": "Links\n\nThe unequalled joy of non-equi joins · Tea & Stats"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Base de conhecimento - Assessoria de Dados SPLOR",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\nDescription\n\n\nCategories\n\n\n\n\n\n\nMar 27, 2023\n\n\nnon equi joins\n\n\nFrancisco \n\n\n\n\n\nundefined\n\n\n\n\n\n\nNo matching items"
+  }
+]
