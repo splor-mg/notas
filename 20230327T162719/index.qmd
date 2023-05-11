@@ -2,74 +2,204 @@
 title: non equi joins
 author: Francisco
 date: 2023-03-27
+execute:
+  echo: true
+format:
+  revealjs:
+    fontsize: 20
 ---
 
-No conjunto de dados do [matriz-fonte-stn-dadosmg](https://github.com/splor-mg/matriz-fonte-stn-dadosmg) o schema do recurso `fonte_stn` que armazena as descrições e interpretações da fonte de recurso da STN é 
-
-```{r,}
+```{r}
 #| echo: false
-library(data.table); library(knitr)
-classificador = fread("classificador.csv")
-execucao <- fread("execucao.csv")
-kable(classificador[order(codigo)])
+#| warning: false
+library(DBI); library(dplyr); library(kableExtra); library(lubridate); library(data.table)
+conn <- dbConnect(RSQLite::SQLite(), "db.sqlite")
+
+extrato <- function() {
+  execucao |>
+  full_join(classificador, by = "code") |>
+  filter(valid_from <= dt_doc, valid_to > dt_doc) |>
+  select(doc, dt_doc, code, description, vl_doc) |> 
+  mutate(year = year(dt_doc)) |> 
+  group_by(year, code, description) |> 
+  summarize(vl_emp = sum(vl_doc)) |>
+  kable()
+}
 ```
 
-Essa estrutura é conveniente porque permite a realização de consultas diversas sobre as classificações. Alguns exemplos:
+```{bash}
+#| echo: false
+sqlite3 db.sqlite < sql/01_create.sql 
+sqlite3 db.sqlite < sql/02_insert.sql
+```
 
-## Necessidades de informação
+```{r}
+#| echo: false
+classificador <- tbl(conn, "classificador")
+execucao <- tbl(conn, "execucao")
+```
 
-### Classificações vigentes atualmente
+# Operações
+
+## Codificação inicial
+
+:::: {.columns}
+::: {.column width="40%"}
+O classificador inicial foi populado com as fontes de recurso 10, 20 e 60.
+
+As colunas `id`, `created_at` e `updated_at` devem idealmente ser geradas de forma automática para tornar o preenchimento mais ágil e menos sujeito a erros. Elas não serão mostradas a menos que necessário.
+:::
+::: {.column width="60%"}
+```{r}
+#| echo: false
+kable(classificador)
+```
+:::
+::::
+
+## Criação e transposição parcial (insert)
+
+```{bash}
+#| echo: false
+sqlite3 db.sqlite < sql/03_insert.sql 
+```
+
+:::: {.columns}
+::: {.column width="40%"}
+Em junho/2021 foi criado a fonte de recurso _61 - Recursos Diretamente Arrecadados Vinculados_.
+
+O objetivo é permitir a identificação de recursos diretamente arrecadados que possuem vinculação específica para evitar que o saldo financeiro dessas fontes fosse incorretamente revertido para o caixa único no encerramento do exercício. 
+
+Até então esses recursos eram classificados na fonte 60.
+:::
+::: {.column width="60%"}
+```{r}
+#| echo: false
+classificador |>
+  select(code, description, valid_from, valid_to) |> 
+  kable() |> 
+  row_spec(4, background = "#d3d3d3")
+```
+:::
+::::
+
+## Correção (update)
+
+```{bash}
+#| echo: false
+sqlite3 db.sqlite < sql/04_update.sql 
+```
+
+:::: {.columns}
+
+::: {.column width="40%"}
+Na inicialização do classificador foi identificado que a descrição da fonte 10 foi incorretamente digitada sem acento.
+
+Ps. Na modelagem atual o histórico dessa alteração é perdido.
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: false
+classificador |>
+  select(code, description, valid_from, valid_to) |> 
+  kable() |> 
+  row_spec(1, background = "#d3d3d3")
+```
+:::
+::::
+
+## Bloqueio e transposição total (update)
+
+```{bash}
+#| echo: false
+sqlite3 db.sqlite < sql/05_update.sql 
+```
+
+:::: {.columns}
+
+::: {.column width="40%"}
+A partir de jan/2022 foi decidido que as fontes devem identificar apenas se trata-se de recurso com destinação específica ou não, sendo o responsável pela arrecadação controlado a partir da unidade orçamentária.
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: false
+classificador |>
+  select(code, description, valid_from, valid_to) |> 
+  kable() |> 
+  row_spec(3:4, background = "#d3d3d3")
+```
+:::
+::::
+
+# Necessidades de informação
+
+```{r}
+#| echo: false
+classificador = as.data.table(classificador)
+execucao = as.data.table(execucao)
+```
+
+## Classificações vigentes atualmente
 
 Essa consulta representa a [tabela de classificação publicada atualmente](https://docs.google.com/spreadsheets/d/1et_q4xTH2p6umWduHRZP-lFDXXK0Q6kN/edit#gid=1636393178) pela DCPPN
 
 ```{r}
-classificador[
-    dt_fim_vigencia == "9999-12-31"
-][order(codigo)] |> kable()
+classificador |> 
+  filter(valid_to == "9999-12-31") |> 
+  arrange(code) |> 
+  kable()
 ```
 
-### Classificações vigentes em uma data específica
+## Classificações vigentes em uma data específica
 
 ```{r}
-classificador["2023-02-01" >= dt_inicio_vigencia & "2023-02-01" < dt_fim_vigencia][order(codigo)] |> kable()
+classificador |> 
+  filter("2023-02-01" >= valid_from & "2023-02-01" < valid_to) |> 
+  arrange(code) |> 
+  kable()
 ```
 
 Vale ressaltar que como a vigência é especificada como um intervalo semi-fechado $[a, b)$, o seguinte filtro gera resultados incorretos
 
 ```{r}
-classificador["2023-02-01" >= dt_inicio_vigencia & "2023-02-01" <= dt_fim_vigencia][order(codigo)] |> kable()
+classificador |> 
+  filter("2023-02-01" >= valid_from & "2023-02-01" <= valid_to) |> 
+  arrange(code) |> 
+  kable()
 ```
 
-### Classificações vigentes na inicialização do classificador
+## Classificações vigentes na inicialização do classificador
 
 ```{r}
-classificador[dt_inicio_vigencia == "0001-01-01"] |> kable()
+classificador |> 
+  filter(valid_to == "0001-01-01") |> 
+  arrange(code) |> 
+  kable()
 ```
 
-### Histórico de alterações de uma classificação
+## Histórico de alterações de uma classificação
 
 ```{r}
-classificador[codigo == 500][order(-dt_fim_vigencia)] |> kable()
+classificador[code == 500][order(-valid_to)] |> kable()
 ```
 
-### Número de alterações sofridas por determinada classificação
+## Número de alterações sofridas por determinada classificação
 
 ```{r}
-classificador[, .N, codigo] |> kable()
+classificador[, .N, code] |> kable()
 ```
 
-### Cruzamento para recuperação das informações cadastrais
+## Cruzamento para recuperação das informações cadastrais
 
 ```{r}
-desc <- classificador[
-  execucao, 
-  .(nr_emp, dt_emp, codigo, descricao, valor), 
-  on = .(codigo, dt_inicio_vigencia <= dt_emp, dt_fim_vigencia > dt_emp)
-]
-desc |> kable()
+  execucao |>
+  full_join(classificador, by = "code") |>
+  filter(valid_from <= dt_doc, valid_to > dt_doc)
 ```
 
-## Necessidades não atendidas
+## Tópicos para discussão
 
 - Imagine que em 04/05/2023 a DCAF fez o cruzamento de dados da seção anterior. No dia seguinte a DCPPN fez uma alteração no classificador da despesa alterando a descrição da fonte 503 "Recursos Diretamente Arrecadados" para "RDA". Sem ter que realizar novamente o cruzamento de todas as linhas, como a DCAF pode identificar essa modificação realizada pela DCPPN?
 
@@ -83,6 +213,38 @@ desc |> kable()
 
 - Qual o mapeamento entre as classificações do SIAFI e GRP?
 
-## Links
+- De qual coluna eu faço a extração da interpretação do elemento item 1301 e 1305?
 
-- [The unequalled joy of non-equi joins · Tea & Stats](https://selbydavid.com/2021/02/13/joins/)
+- Armazenamento com git
+
+    ```
+      classificador/
+    ├── elemento
+    └── fonte
+        └── 10
+            ├── latest.md
+            ├── v1.md
+            ├── v2.md
+            └── v3.md
+    ```
+
+## Operadores lógicos
+
+- `blq`	- bloqueado
+- `cri` - criado sem reaproveitamento
+- `cri-r` - criado com reaproveitamento (reativação de código)
+- `doc` - documentação [alterada] (obs.: inclui todos os demais grupos de informação, ex.: interpretação, notas etc)
+- `dsc` - descrição [alterada]
+- `dsc-doc` - descrição e documentação [alterados]
+- `dsc-n` - descrição e nível [alterados]
+- `nv` - nível [alterado]
+- `dsbq` - desbloqueado
+- `tpd` - transposição parcial de
+- `tpp` - transposição parcial para
+- `ttd` - transposição total de
+- `ttp` - transposição total para [cod. fica bloqueado]
+
+
+```{r}
+dbDisconnect(conn)
+```
