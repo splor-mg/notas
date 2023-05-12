@@ -8,5 +8,6 @@ Imports:
     RSQLite,
     tidyverse,
     data.table,
-    rmarkdown
+    rmarkdown,
+    kableExtra
 Encoding: UTF-8
