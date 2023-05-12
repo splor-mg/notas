@@ -1,5 +1,5 @@
 ---
-title: non equi joins
+title: Gestão de dados de referência
 author: Francisco
 date: 2023-03-27
 execute:
@@ -39,9 +39,23 @@ classificador <- tbl(conn, "classificador")
 execucao <- tbl(conn, "execucao")
 ```
 
+# Introdução
+
+> The best layouts/formats (as well as software and interfaces) for data entry and data analysis might be different. It is important to take this into account, and ideally automate the conversion from one to another.
+> 
+> -- [Data Organization in Spreadsheets for Social Scientists: Formatting Data Tables in Spreadsheets](https://datacarpentry.org/spreadsheets-socialsci/01-format-data.html#callout1)
+
+Nessa etapa o objetivo é sugerir um modelo de dados para armazenamento que facilite sua utilização nos fluxos de dados automatizados.
+
+O modelo vai ser baseado em três conceitos:
+
+- [Tabela bitemporal](https://en.wikipedia.org/wiki/Bitemporal_modeling) para gestão de [dados de referência](https://en.wikipedia.org/wiki/Reference_data)
+- [Trilha de auditoria](https://dba.stackexchange.com/questions/15186/what-is-an-audit-table) das alterações
+- [Listas de referência cruzada](https://en.wikipedia.org/wiki/Schema_crosswalk) entre as [classificações históricas](https://www.youtube.com/watch?v=ummPGYFr_eE)
+
 # Operações
 
-## Codificação inicial
+## Criação (insert)
 
 :::: {.columns}
 ::: {.column width="40%"}
@@ -57,7 +71,7 @@ kable(classificador)
 :::
 ::::
 
-## Criação e transposição parcial (insert)
+## Transposição parcial (insert)
 
 ```{bash}
 #| echo: false
@@ -133,12 +147,63 @@ classificador |>
 :::
 ::::
 
-# Necessidades de informação
+## Descrição (update)
 
+```{bash}
+#| echo: false
+sqlite3 db.sqlite < sql/06_update.sql 
+```
+
+:::: {.columns}
+
+::: {.column width="40%"}
+A partir de jan/2023 a fonte 10 deve ser chamada de "recursos não vinculados".
+:::
+
+::: {.column width="60%"}
 ```{r}
 #| echo: false
-classificador = as.data.table(classificador)
-execucao = as.data.table(execucao)
+classificador |>
+  select(code, description, valid_from, valid_to) |> 
+  kable() |> 
+  row_spec(c(1, 5), background = "#d3d3d3")
+```
+:::
+::::
+
+# Necessidades de informação
+
+## Cruzamento para recuperação das informações cadastrais {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| echo: false
+classificador |>
+  select(code, description, valid_from, valid_to) |> 
+  kable() 
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| echo: false  
+  execucao |>
+  kable()
+```
+:::
+::::
+
+
+
+
+```{r}
+  execucao |>
+  full_join(classificador, by = "code") |>
+  filter(valid_from <= dt_doc, valid_to > dt_doc) |> 
+  select(doc, code, description, dt_doc, vl_doc, hist) |> 
+  kable()
 ```
 
 ## Classificações vigentes atualmente
@@ -147,6 +212,7 @@ Essa consulta representa a [tabela de classificação publicada atualmente](http
 
 ```{r}
 classificador |> 
+  select(code, description, valid_from, valid_to) |> 
   filter(valid_to == "9999-12-31") |> 
   arrange(code) |> 
   kable()
@@ -156,7 +222,8 @@ classificador |>
 
 ```{r}
 classificador |> 
-  filter("2023-02-01" >= valid_from & "2023-02-01" < valid_to) |> 
+  select(code, description, valid_from, valid_to) |> 
+  filter("2022-01-01" >= valid_from & "2022-01-01" < valid_to) |> 
   arrange(code) |> 
   kable()
 ```
@@ -165,7 +232,8 @@ Vale ressaltar que como a vigência é especificada como um intervalo semi-fecha
 
 ```{r}
 classificador |> 
-  filter("2023-02-01" >= valid_from & "2023-02-01" <= valid_to) |> 
+  select(code, description, valid_from, valid_to) |> 
+  filter("2022-01-01" >= valid_from & "2022-01-01" <= valid_to) |> 
   arrange(code) |> 
   kable()
 ```
@@ -174,7 +242,8 @@ classificador |>
 
 ```{r}
 classificador |> 
-  filter(valid_to == "0001-01-01") |> 
+  select(code, description, valid_from, valid_to) |> 
+  filter(valid_from == "0001-01-01") |> 
   arrange(code) |> 
   kable()
 ```
@@ -182,21 +251,17 @@ classificador |>
 ## Histórico de alterações de uma classificação
 
 ```{r}
-classificador[code == 500][order(-valid_to)] |> kable()
+classificador |> 
+  filter(code == 10) |> 
+  arrange(desc(valid_to)) |> 
+  kable()
 ```
 
 ## Número de alterações sofridas por determinada classificação
 
 ```{r}
-classificador[, .N, code] |> kable()
-```
-
-## Cruzamento para recuperação das informações cadastrais
-
-```{r}
-  execucao |>
-  full_join(classificador, by = "code") |>
-  filter(valid_from <= dt_doc, valid_to > dt_doc)
+classificador |>
+  count(code) |> kable()
 ```
 
 ## Tópicos para discussão
