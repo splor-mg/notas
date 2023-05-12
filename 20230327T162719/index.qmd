@@ -199,9 +199,6 @@ classificador |>
 :::
 ::::
 
-
-
-
 ```{r}
   execucao |>
   full_join(classificador, by = "code") |>
@@ -209,6 +206,12 @@ classificador |>
   select(doc, code, description, dt_doc, vl_doc, hist) |> 
   kable()
 ```
+
+## Últimas atualizações
+
+![](img/20230512T140905.png)
+
+-- [Fonte](https://www.mg.gov.br/planejamento/documento/classificador-economico-da-despesa-atualizado-em-17082020-pdf)
 
 ## Classificações vigentes atualmente
 
