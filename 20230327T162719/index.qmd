@@ -53,6 +53,10 @@ O modelo vai ser baseado em três conceitos:
 - [Trilha de auditoria](https://dba.stackexchange.com/questions/15186/what-is-an-audit-table) das alterações
 - [Listas de referência cruzada](https://en.wikipedia.org/wiki/Schema_crosswalk) entre as [classificações históricas](https://www.youtube.com/watch?v=ummPGYFr_eE)
 
+Para validação[^20230512T132602] do modelo o ideal é fazermos comparações entre a usabilidade das alternativas para atender as necessidades de informação (de todos os atores). 
+
+[^20230512T132602]: Veja que ainda podemos decidir que não faz sentido a utilização do modelo por dificuldades na entrada dos dados.
+
 # Operações
 
 ## Criação (insert)
@@ -238,7 +242,7 @@ classificador |>
   kable()
 ```
 
-## Classificações vigentes na inicialização do classificador
+## Classificações vigentes na inicialização do classificador {visibility="hidden"}
 
 ```{r}
 classificador |> 
@@ -248,7 +252,7 @@ classificador |>
   kable()
 ```
 
-## Histórico de alterações de uma classificação
+## Histórico de alterações de uma classificação {visibility="hidden"}
 
 ```{r}
 classificador |> 
@@ -257,20 +261,22 @@ classificador |>
   kable()
 ```
 
-## Número de alterações sofridas por determinada classificação
+## Número de alterações sofridas por determinada classificação {visibility="hidden"}
 
 ```{r}
 classificador |>
   count(code) |> kable()
 ```
 
-## Tópicos para discussão
+## Tópicos para discussão {visibility="hidden"}
 
 - Imagine que em 04/05/2023 a DCAF fez o cruzamento de dados da seção anterior. No dia seguinte a DCPPN fez uma alteração no classificador da despesa alterando a descrição da fonte 503 "Recursos Diretamente Arrecadados" para "RDA". Sem ter que realizar novamente o cruzamento de todas as linhas, como a DCAF pode identificar essa modificação realizada pela DCPPN?
 
 - Como garantir ou validar que a data de fim de vigência de uma classificação seja igual a data de inicio de vigência de outra classificação?
 
 - Classificação deve ser utilizada na LOA mas não será utilizada durante a execução
+
+- Necessidades de informação: changelog classificador da despesa com diff
 
 - Quem alterou a descrição da fonte 503 "Recursos Diretamente Arrecadados" para "RDA"? Porque essa alteração foi realizada?
 
@@ -295,7 +301,6 @@ classificador |>
 
 ## Operadores lógicos
 
-- `blq`	- bloqueado
 - `cri` - criado sem reaproveitamento
 - `cri-r` - criado com reaproveitamento (reativação de código)
 - `doc` - documentação [alterada] (obs.: inclui todos os demais grupos de informação, ex.: interpretação, notas etc)
@@ -303,6 +308,7 @@ classificador |>
 - `dsc-doc` - descrição e documentação [alterados]
 - `dsc-n` - descrição e nível [alterados]
 - `nv` - nível [alterado]
+- `blq`	- bloqueado
 - `dsbq` - desbloqueado
 - `tpd` - transposição parcial de
 - `tpp` - transposição parcial para
