@@ -53,7 +53,21 @@
     "href": "20231804T160439/index.html#resultado-1",
     "title": "Relacionamento das bases no relatório operacional: método Concatenate x Linktable",
     "section": "Resultado",
-    "text": "Resultado\nApós seguir os passos anteriores e dar o comando ctrl R no script do qlikview, o resultado serão uma única tabela dimensão ligada as tabelas fato por meio de chaves, verificada por meio do comando ctrl T, conforme figura a seguir:\n[].\n[].\n[].\n[].\n[]."
+    "text": "Resultado\nApós seguir os passos anteriores e dar o comando ctrl R no script do qlikview, o resultado serão uma única tabela dimensão ligada as tabelas fato por meio de chaves, verificada por meio do comando ctrl T, conforme figura a seguir:\n[]."
+  },
+  {
+    "objectID": "20231804T160439/index.html#criação-de-dashboards-no-método-linktable",
+    "href": "20231804T160439/index.html#criação-de-dashboards-no-método-linktable",
+    "title": "Relacionamento das bases no relatório operacional: método Concatenate x Linktable",
+    "section": "Criação de dashboards no método Linktable:",
+    "text": "Criação de dashboards no método Linktable:\nDe maneira análoga ao exemplo anterior de empilhamento de bases, foram utilizados os mesmos campos para criação da Tabela 2 e os filtros. Os dados totais sem filtro são exatamente iguais aos da Tabela 1.\n[]."
+  },
+  {
+    "objectID": "20231804T160439/index.html#utilização-dos-filtros-e-resultados-no-método-linktable",
+    "href": "20231804T160439/index.html#utilização-dos-filtros-e-resultados-no-método-linktable",
+    "title": "Relacionamento das bases no relatório operacional: método Concatenate x Linktable",
+    "section": "Utilização dos filtros e resultados no método linktable",
+    "text": "Utilização dos filtros e resultados no método linktable\nAo se filtrar por alguma dimensão comum entre todas as bases das variáveis que compõem a Tabela 2, o resultado é o mesmo da Tabela 1, retornando dados corretamente.\n[].\nA diferença entre o método de empilhamento e o linktable ocorre ao se filtrar por alguma dimensão que inexiste em alguma das bases das variáveis que compõem a Tabela 2. Neste Caso, diferente do exemplo da Tabela 1, ao se filtrar por exemplo por Elemento Item, os dados de Crédito Inicial e Autorizado retornarão dados da estrutura orçamentária em que a houve Execução de Despesa, e/ou Aprovação de Cota.\n[].\nO mesmo ocorre quando se filtra por algum contrato, em que haverá o retorno de dados de Crédito Inicial e Autorizado e Cota Aprovada na estrutura orçamentária em que a Execução da Despesa nesse contrato ocorreu.\n[]."
   },
   {
     "objectID": "index.html",

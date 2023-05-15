@@ -160,9 +160,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="as-diferentes-granularidades-das-bases-que-alimentam-o-relatório-operacional-qlikview" class="level1">
 <h1>As diferentes granularidades das bases que alimentam o relatório operacional qlikview:</h1>
 <p>O qlikview é uma ferramenta de selfservice BI, que permite que usuários com conhecimento de comandos básicos da ferramenta sejam capazes de criar suas próprias visualizações. A forma mais intuitiva, e geralmente mais a utilizada por esses usuários, é empilhar todas as bases que se deseja utilizar, por meio do comando <code>Concatenate</code> no <code>Script</code> do aplicativo. Este método é satisfatório quando inexiste diferença de granularidade nas bases. Entretanto, no caso das bases do relatório operacional, que apresentam diferentes granularidades entre suas bases, o empilhamento em uma única base traz problemas ao usuário da ferramenta, ilustrados no tópico a seguir.</p>
-</section>
-<section id="diferentes-granularidades-nas-bases-do-relatório-operacional" class="level1">
-<h1>Diferentes granularidades nas bases do relatório operacional:</h1>
 <p>As diferentes granularidades (dimensões) dos dados pode ser verificada por meio do ementário completo das bases do projeto disponível em <a href="https://gist.github.com/hslinhares/68a3d06eae13b8facb1df42e1095c49e">data package relatorio operacional</a>.</p>
 <p>Para exemplificar os métodos de empilhamento (concatenate) e linktable nesta nota, são utilizados como amostra, as bases de Execução da Despesa, Crédito Inicial e Autorizado, e Aprovação de Cota Orçamentária, todas do exercício 2022 e provenientes do armazém B.O.</p>
 </section>
@@ -488,9 +485,19 @@ FROM
 <h2 class="anchored" data-anchor-id="resultado-1">Resultado</h2>
 <p>Após seguir os passos anteriores e dar o comando <code>ctrl R</code> no script do qlikview, o resultado serão uma única tabela dimensão ligada as tabelas fato por meio de chaves, verificada por meio do comando <code>ctrl T</code>, conforme figura a seguir:</p>
 <p>[<img src="figuras/linktable.png" class="img-fluid" alt="base empilhada">].</p>
+</section>
+<section id="criação-de-dashboards-no-método-linktable" class="level2">
+<h2 class="anchored" data-anchor-id="criação-de-dashboards-no-método-linktable">Criação de <em>dashboards</em> no método <em>Linktable</em>:</h2>
+<p>De maneira análoga ao exemplo anterior de empilhamento de bases, foram utilizados os mesmos campos para criação da Tabela 2 e os filtros. Os dados totais sem filtro são exatamente iguais aos da Tabela 1.</p>
 <p>[<img src="figuras/linktable_painel.png" class="img-fluid" alt="base empilhada">].</p>
+</section>
+<section id="utilização-dos-filtros-e-resultados-no-método-linktable" class="level2">
+<h2 class="anchored" data-anchor-id="utilização-dos-filtros-e-resultados-no-método-linktable">Utilização dos filtros e resultados no método <em>linktable</em></h2>
+<p>Ao se filtrar por alguma dimensão comum entre todas as bases das variáveis que compõem a Tabela 2, o resultado é o mesmo da Tabela 1, retornando dados corretamente.</p>
 <p>[<img src="figuras/linktable_filtro-1.png" class="img-fluid" alt="base empilhada">].</p>
+<p>A diferença entre o método de empilhamento e o linktable ocorre ao se filtrar por alguma dimensão que inexiste em alguma das bases das variáveis que compõem a Tabela 2. Neste Caso, diferente do exemplo da Tabela 1, ao se filtrar por exemplo por Elemento Item, os dados de Crédito Inicial e Autorizado retornarão dados da estrutura orçamentária em que a houve Execução de Despesa, e/ou Aprovação de Cota.</p>
 <p>[<img src="figuras/linktable_filtro-2.png" class="img-fluid" alt="base empilhada">].</p>
+<p>O mesmo ocorre quando se filtra por algum contrato, em que haverá o retorno de dados de Crédito Inicial e Autorizado e Cota Aprovada na estrutura orçamentária em que a Execução da Despesa nesse contrato ocorreu.</p>
 <p>[<img src="figuras/linktable_filtro-3.png" class="img-fluid" alt="base empilhada">].</p>
 
 
