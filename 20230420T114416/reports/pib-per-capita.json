@@ -1,0 +1,37 @@
+{
+  "valid": true,
+  "stats": {
+    "tasks": 1,
+    "errors": 0,
+    "warnings": 0,
+    "seconds": 0.011
+  },
+  "warnings": [],
+  "errors": [],
+  "tasks": [
+    {
+      "name": "pib-per-capita",
+      "type": "table",
+      "valid": true,
+      "place": "data/pib-per-capita.csv",
+      "labels": [
+        "COD",
+        "POP_2013",
+        "PIB_2013",
+        "PIB_PER_CAPITA_2013"
+      ],
+      "stats": {
+        "errors": 0,
+        "warnings": 0,
+        "seconds": 0.01,
+        "md5": "53837c7b9a99fd88999b2678de7de203",
+        "sha256": "4612decab9f8f2152604b669aee6d076150e39ac73130c7ba73cff3b8429f657",
+        "bytes": 1222,
+        "fields": 4,
+        "rows": 27
+      },
+      "warnings": [],
+      "errors": []
+    }
+  ]
+}
