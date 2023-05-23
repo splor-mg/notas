@@ -1,37 +1,79 @@
 [
   {
-    "objectID": "20230327T162719/index.html",
-    "href": "20230327T162719/index.html",
-    "title": "non equi joins",
-    "section": "",
-    "text": "No conjunto de dados do matriz-fonte-stn-dadosmg o schema do recurso fonte_stn que armazena as descrições e interpretações da fonte de recurso da STN é\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Ordinários\n1-01-01\n2023-02-01\n\n\n500\nRecursos Não vinculados\n2023-02-01\n2023-05-01\n\n\n500\nRecursos Não Vinculados de Impostos\n2023-05-01\n9999-12-31\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n503\nRecursos Diretamente Arrecadados\n2023-02-01\n9999-12-31\nEssa estrutura é conveniente porque permite a realização de consultas diversas sobre as classificações. Alguns exemplos:"
+    "objectID": "20230327T162719/index.html#criação-insert",
+    "href": "20230327T162719/index.html#criação-insert",
+    "title": "Gestão de dados de referência",
+    "section": "Criação (insert)",
+    "text": "Criação (insert)\n\n\nO classificador inicial foi populado com as fontes de recurso 10, 20 e 60.\nAs colunas id, created_at e updated_at devem idealmente ser geradas de forma automática para tornar o preenchimento mais ágil e menos sujeito a erros. Elas não serão mostradas a menos que necessário.\n\n\n\n\n\n\nid\ncode\ndescription\nvalid_from\nvalid_to\ncreated_at\nupdated_at\n\n\n\n\n1\n10\nRecursos Ordinarios\n0001-01-01\n9999-12-31\n2023-05-23 19:31:44\n2023-05-23 19:31:44\n\n\n2\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n2023-05-23 19:31:44\n2023-05-23 19:31:44\n\n\n3\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n9999-12-31\n2023-05-23 19:31:44\n2023-05-23 19:31:44"
   },
   {
-    "objectID": "20230327T162719/index.html#necessidades-de-informação",
-    "href": "20230327T162719/index.html#necessidades-de-informação",
-    "title": "non equi joins",
-    "section": "Necessidades de informação",
-    "text": "Necessidades de informação\n\nClassificações vigentes atualmente\nEssa consulta representa a tabela de classificação publicada atualmente pela DCPPN\n\nclassificador[\n    dt_fim_vigencia == \"9999-12-31\"\n][order(codigo)] |&gt; kable()\n\n\n\n\n\n\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Não Vinculados de Impostos\n2023-05-01\n9999-12-31\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n503\nRecursos Diretamente Arrecadados\n2023-02-01\n9999-12-31\n\n\n\n\n\n\n\nClassificações vigentes em uma data específica\n\nclassificador[\"2023-02-01\" &gt;= dt_inicio_vigencia & \"2023-02-01\" &lt; dt_fim_vigencia][order(codigo)] |&gt; kable()\n\n\n\n\n\n\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Não vinculados\n2023-02-01\n2023-05-01\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n503\nRecursos Diretamente Arrecadados\n2023-02-01\n9999-12-31\n\n\n\n\n\nVale ressaltar que como a vigência é especificada como um intervalo semi-fechado \\([a, b)\\), o seguinte filtro gera resultados incorretos\n\nclassificador[\"2023-02-01\" &gt;= dt_inicio_vigencia & \"2023-02-01\" &lt;= dt_fim_vigencia][order(codigo)] |&gt; kable()\n\n\n\n\n\n\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Ordinários\n1-01-01\n2023-02-01\n\n\n500\nRecursos Não vinculados\n2023-02-01\n2023-05-01\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n503\nRecursos Diretamente Arrecadados\n2023-02-01\n9999-12-31\n\n\n\n\n\n\n\nClassificações vigentes na inicialização do classificador\n\nclassificador[dt_inicio_vigencia == \"0001-01-01\"] |&gt; kable()\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Ordinários\n1-01-01\n2023-02-01\n\n\n501\nRecursos Vinculados\n1-01-01\n9999-12-31\n\n\n\n\n\n\n\nHistórico de alterações de uma classificação\n\nclassificador[codigo == 500][order(-dt_fim_vigencia)] |&gt; kable()\n\n\n\n\n\n\n\n\n\n\ncodigo\ndescricao\ndt_inicio_vigencia\ndt_fim_vigencia\n\n\n\n\n500\nRecursos Não Vinculados de Impostos\n2023-05-01\n9999-12-31\n\n\n500\nRecursos Não vinculados\n2023-02-01\n2023-05-01\n\n\n500\nRecursos Ordinários\n1-01-01\n2023-02-01\n\n\n\n\n\n\n\nNúmero de alterações sofridas por determinada classificação\n\nclassificador[, .N, codigo] |&gt; kable()\n\n\n\n\ncodigo\nN\n\n\n\n\n500\n3\n\n\n501\n1\n\n\n503\n1\n\n\n\n\n\n\n\nCruzamento para recuperação das informações cadastrais\n\ndesc &lt;- classificador[\n  execucao, \n  .(nr_emp, dt_emp, codigo, descricao, valor), \n  on = .(codigo, dt_inicio_vigencia &lt;= dt_emp, dt_fim_vigencia &gt; dt_emp)\n]\ndesc |&gt; kable()\n\n\n\n\nnr_emp\ndt_emp\ncodigo\ndescricao\nvalor\n\n\n\n\n1\n2023-01-01\n500\nRecursos Ordinários\n5.0\n\n\n2\n2023-01-01\n501\nRecursos Vinculados\n10.0\n\n\n3\n2023-02-01\n500\nRecursos Não vinculados\n7.5\n\n\n4\n2022-12-01\n503\nNA\n12.0"
+    "objectID": "20230327T162719/index.html#transposição-parcial-insert",
+    "href": "20230327T162719/index.html#transposição-parcial-insert",
+    "title": "Gestão de dados de referência",
+    "section": "Transposição parcial (insert)",
+    "text": "Transposição parcial (insert)\n\n\nEm junho/2021 foi criado a fonte de recurso 61 - Recursos Diretamente Arrecadados Vinculados.\nO objetivo é permitir a identificação de recursos diretamente arrecadados que possuem vinculação específica para evitar que o saldo financeiro dessas fontes fosse incorretamente revertido para o caixa único no encerramento do exercício.\nAté então esses recursos eram classificados na fonte 60.\n\n\n\n\n\n\ncode\ndescription\nvalid_from\nvalid_to\n\n\n\n\n10\nRecursos Ordinarios\n0001-01-01\n9999-12-31\n\n\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n\n\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n9999-12-31\n\n\n61\nRecursos Diretamente Arrecadados Vinculados\n2021-06-01\n9999-12-31"
   },
   {
-    "objectID": "20230327T162719/index.html#necessidades-não-atendidas",
-    "href": "20230327T162719/index.html#necessidades-não-atendidas",
-    "title": "non equi joins",
-    "section": "Necessidades não atendidas",
-    "text": "Necessidades não atendidas\n\nImagine que em 04/05/2023 a DCAF fez o cruzamento de dados da seção anterior. No dia seguinte a DCPPN fez uma alteração no classificador da despesa alterando a descrição da fonte 503 “Recursos Diretamente Arrecadados” para “RDA”. Sem ter que realizar novamente o cruzamento de todas as linhas, como a DCAF pode identificar essa modificação realizada pela DCPPN?\nComo garantir ou validar que a data de fim de vigência de uma classificação seja igual a data de inicio de vigência de outra classificação?\nClassificação deve ser utilizada na LOA mas não será utilizada durante a execução\nQuem alterou a descrição da fonte 503 “Recursos Diretamente Arrecadados” para “RDA”? Porque essa alteração foi realizada?\nEm uma data específica eu fiz a classificação de um empenho na fonte 501. Hoje, quais são as classificações possíveis para esse empenho?\nQual o mapeamento entre as classificações do SIAFI e GRP?"
+    "objectID": "20230327T162719/index.html#correção-update",
+    "href": "20230327T162719/index.html#correção-update",
+    "title": "Gestão de dados de referência",
+    "section": "Correção (update)",
+    "text": "Correção (update)\n\n\nNa inicialização do classificador foi identificado que a descrição da fonte 10 foi incorretamente digitada sem acento.\nPs. Na modelagem atual o histórico dessa alteração é perdido.\n\n\n\n\n\n\ncode\ndescription\nvalid_from\nvalid_to\n\n\n\n\n10\nRecursos Ordinários\n0001-01-01\n9999-12-31\n\n\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n\n\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n9999-12-31\n\n\n61\nRecursos Diretamente Arrecadados Vinculados\n2021-06-01\n9999-12-31"
   },
   {
-    "objectID": "20230327T162719/index.html#links",
-    "href": "20230327T162719/index.html#links",
-    "title": "non equi joins",
-    "section": "Links",
-    "text": "Links\n\nThe unequalled joy of non-equi joins · Tea & Stats"
+    "objectID": "20230327T162719/index.html#bloqueio-e-transposição-total-update",
+    "href": "20230327T162719/index.html#bloqueio-e-transposição-total-update",
+    "title": "Gestão de dados de referência",
+    "section": "Bloqueio e transposição total (update)",
+    "text": "Bloqueio e transposição total (update)\n\n\nA partir de jan/2022 foi decidido que as fontes devem identificar apenas se trata-se de recurso com destinação específica ou não, sendo o responsável pela arrecadação controlado a partir da unidade orçamentária.\n\n\n\n\n\n\ncode\ndescription\nvalid_from\nvalid_to\n\n\n\n\n10\nRecursos Ordinários\n0001-01-01\n9999-12-31\n\n\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n\n\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n2022-01-01\n\n\n61\nRecursos Diretamente Arrecadados Vinculados\n2021-06-01\n2022-01-01"
+  },
+  {
+    "objectID": "20230327T162719/index.html#descrição-update",
+    "href": "20230327T162719/index.html#descrição-update",
+    "title": "Gestão de dados de referência",
+    "section": "Descrição (update)",
+    "text": "Descrição (update)\n\n\nA partir de jan/2023 a fonte 10 deve ser chamada de “recursos não vinculados”.\n\n\n\n\n\n\ncode\ndescription\nvalid_from\nvalid_to\n\n\n\n\n10\nRecursos Ordinários\n0001-01-01\n2023-01-01\n\n\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n\n\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n2022-01-01\n\n\n61\nRecursos Diretamente Arrecadados Vinculados\n2021-06-01\n2022-01-01\n\n\n10\nRecursos Não Vinculados\n2023-01-01\n9999-12-31"
+  },
+  {
+    "objectID": "20230327T162719/index.html#cruzamento-para-recuperação-das-informações-cadastrais",
+    "href": "20230327T162719/index.html#cruzamento-para-recuperação-das-informações-cadastrais",
+    "title": "Gestão de dados de referência",
+    "section": "Cruzamento para recuperação das informações cadastrais",
+    "text": "Cruzamento para recuperação das informações cadastrais\n\n\n\n\n\n\n\ncode\ndescription\nvalid_from\nvalid_to\n\n\n\n\n10\nRecursos Ordinários\n0001-01-01\n2023-01-01\n\n\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n\n\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n2022-01-01\n\n\n61\nRecursos Diretamente Arrecadados Vinculados\n2021-06-01\n2022-01-01\n\n\n10\nRecursos Não Vinculados\n2023-01-01\n9999-12-31\n\n\n\n\n\n\n\n\n\n\n\n\n\ndoc\ncode\ndt_doc\nvl_doc\nhist\n\n\n\n\n1\n10\n2021-02-15\n5\nNA\n\n\n2\n10\n2021-02-20\n60\nNA\n\n\n3\n20\n2021-05-15\n35\nNA\n\n\n4\n60\n2021-04-15\n10\nNA\n\n\n5\n60\n2021-04-15\n2\nRecurso para reforma de unidades prisionais\n\n\n6\n61\n2021-06-15\n3\nRecurso para reforma de unidades prisionais\n\n\n7\n10\n2022-02-20\n50\nNA\n\n\n8\n20\n2022-05-15\n15\nNA\n\n\n9\n10\n2022-06-15\n5\nRecurso diretamente arrecadado\n\n\n10\n20\n2022-06-15\n4\nRecurso para reforma de unidades prisionais\n\n\n11\n10\n2023-02-20\n75\nNA\n\n\n\n\n\n\n\n\n\n\n  execucao |&gt;\n  full_join(classificador, by = \"code\") |&gt;\n  filter(valid_from &lt;= dt_doc, valid_to &gt; dt_doc) |&gt; \n  select(doc, code, description, dt_doc, vl_doc, hist) |&gt; \n  kable()\n\n\n\n\ndoc\ncode\ndescription\ndt_doc\nvl_doc\nhist\n\n\n\n\n1\n10\nRecursos Ordinários\n2021-02-15\n5\nNA\n\n\n2\n10\nRecursos Ordinários\n2021-02-20\n60\nNA\n\n\n3\n20\nRecursos Vinculados\n2021-05-15\n35\nNA\n\n\n4\n60\nRecursos Diretamente Arrecadados\n2021-04-15\n10\nNA\n\n\n5\n60\nRecursos Diretamente Arrecadados\n2021-04-15\n2\nRecurso para reforma de unidades prisionais\n\n\n6\n61\nRecursos Diretamente Arrecadados Vinculados\n2021-06-15\n3\nRecurso para reforma de unidades prisionais\n\n\n7\n10\nRecursos Ordinários\n2022-02-20\n50\nNA\n\n\n8\n20\nRecursos Vinculados\n2022-05-15\n15\nNA\n\n\n9\n10\nRecursos Ordinários\n2022-06-15\n5\nRecurso diretamente arrecadado\n\n\n10\n20\nRecursos Vinculados\n2022-06-15\n4\nRecurso para reforma de unidades prisionais\n\n\n11\n10\nRecursos Não Vinculados\n2023-02-20\n75\nNA"
+  },
+  {
+    "objectID": "20230327T162719/index.html#últimas-atualizações",
+    "href": "20230327T162719/index.html#últimas-atualizações",
+    "title": "Gestão de dados de referência",
+    "section": "Últimas atualizações",
+    "text": "Últimas atualizações\n\n– Fonte"
+  },
+  {
+    "objectID": "20230327T162719/index.html#classificações-vigentes-atualmente",
+    "href": "20230327T162719/index.html#classificações-vigentes-atualmente",
+    "title": "Gestão de dados de referência",
+    "section": "Classificações vigentes atualmente",
+    "text": "Classificações vigentes atualmente\nEssa consulta representa a tabela de classificação publicada atualmente pela DCPPN\n\nclassificador |&gt; \n  select(code, description, valid_from, valid_to) |&gt; \n  filter(valid_to == \"9999-12-31\") |&gt; \n  arrange(code) |&gt; \n  kable()\n\n\n\n\ncode\ndescription\nvalid_from\nvalid_to\n\n\n\n\n10\nRecursos Não Vinculados\n2023-01-01\n9999-12-31\n\n\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31"
+  },
+  {
+    "objectID": "20230327T162719/index.html#classificações-vigentes-em-uma-data-específica",
+    "href": "20230327T162719/index.html#classificações-vigentes-em-uma-data-específica",
+    "title": "Gestão de dados de referência",
+    "section": "Classificações vigentes em uma data específica",
+    "text": "Classificações vigentes em uma data específica\n\nclassificador |&gt; \n  select(code, description, valid_from, valid_to) |&gt; \n  filter(\"2022-01-01\" &gt;= valid_from & \"2022-01-01\" &lt; valid_to) |&gt; \n  arrange(code) |&gt; \n  kable()\n\n\n\n\ncode\ndescription\nvalid_from\nvalid_to\n\n\n\n\n10\nRecursos Ordinários\n0001-01-01\n2023-01-01\n\n\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n\n\n\n\n\n\n\nVale ressaltar que como a vigência é especificada como um intervalo semi-fechado \\([a, b)\\), o seguinte filtro gera resultados incorretos\n\nclassificador |&gt; \n  select(code, description, valid_from, valid_to) |&gt; \n  filter(\"2022-01-01\" &gt;= valid_from & \"2022-01-01\" &lt;= valid_to) |&gt; \n  arrange(code) |&gt; \n  kable()\n\n\n\n\ncode\ndescription\nvalid_from\nvalid_to\n\n\n\n\n10\nRecursos Ordinários\n0001-01-01\n2023-01-01\n\n\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n\n\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n2022-01-01\n\n\n61\nRecursos Diretamente Arrecadados Vinculados\n2021-06-01\n2022-01-01"
+  },
+  {
+    "objectID": "20230327T162719/index.html#operadores-lógicos",
+    "href": "20230327T162719/index.html#operadores-lógicos",
+    "title": "Gestão de dados de referência",
+    "section": "Operadores lógicos",
+    "text": "Operadores lógicos\n\ncri - criado sem reaproveitamento\ncri-r - criado com reaproveitamento (reativação de código)\ndoc - documentação [alterada] (obs.: inclui todos os demais grupos de informação, ex.: interpretação, notas etc)\ndsc - descrição [alterada]\ndsc-doc - descrição e documentação [alterados]\ndsc-n - descrição e nível [alterados]\nnv - nível [alterado]\nblq - bloqueado\ndsbq - desbloqueado\ntpd - transposição parcial de\ntpp - transposição parcial para\nttd - transposição total de\nttp - transposição total para [cod. fica bloqueado]\n\n\ndbDisconnect(conn)"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Base de conhecimento - Assessoria de Dados SPLOR",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\nDescription\n\n\nCategories\n\n\n\n\n\n\nMar 27, 2023\n\n\nnon equi joins\n\n\nFrancisco \n\n\n\n\n\nundefined\n\n\n\n\n\n\nNo matching items"
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\nDescription\n\n\nCategories\n\n\n\n\n\n\nMar 27, 2023\n\n\nGestão de dados de referência\n\n\nFrancisco \n\n\n\n\n\nundefined\n\n\n\n\n\n\nNo matching items"
   }
 ]
