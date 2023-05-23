@@ -144,7 +144,6 @@ A partir de jan/2022 foi decidido que as fontes devem identificar apenas se trat
 ```{r}
 #| echo: false
 classificador |>
-  select(code, description, valid_from, valid_to) |> 
   kable() |> 
   row_spec(3:4, background = "#d3d3d3")
 ```
@@ -273,7 +272,7 @@ classificador |>
 
 ## Tópicos para discussão {visibility="hidden"}
 
-- Imagine que em 04/05/2023 a DCAF fez o cruzamento de dados da seção anterior. No dia seguinte a DCPPN fez uma alteração no classificador da despesa alterando a descrição da fonte 503 "Recursos Diretamente Arrecadados" para "RDA". Sem ter que realizar novamente o cruzamento de todas as linhas, como a DCAF pode identificar essa modificação realizada pela DCPPN?
+- Imagine que em 04/05/2023 a DCAF fez o cruzamento de dados da seção anterior. No dia seguinte a DCPPN fez uma alteração no classificador da despesa alterando a descrição da fonte 10 para "Recursos Não Vinculados". Sem ter que realizar novamente o cruzamento de todas as linhas, como a DCAF pode identificar essa modificação realizada pela DCPPN?
 
 - Como garantir ou validar que a data de fim de vigência de uma classificação seja igual a data de inicio de vigência de outra classificação?
 
