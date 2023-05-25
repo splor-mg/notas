@@ -10,6 +10,7 @@ COPY DESCRIPTION .
 
 RUN apt-get -y update
 RUN apt-get install -y --no-install-recommends libxt6
+RUN apt-get install -y sqlite3
 RUN python -m pip install -r requirements.txt
 RUN Rscript -e "install.packages('renv')" && Rscript -e 'renv::install()'
 
