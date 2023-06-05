@@ -23,7 +23,7 @@ Memo: Desbloqueio e transposição parcial [10->60; 20->60]
 
 ## Evento
 
-Em junho/2011 foi criada a fonte de recurso 61 - Recursos Diretamente Arrecadados Vinculados.
+Em jan/2012 foi criada a fonte de recurso 61 - Recursos Diretamente Arrecadados Vinculados.
 
 O objetivo é permitir a identificação de recursos diretamente arrecadados que possuem vinculação específica para evitar que o saldo financeiro dessas fontes fosse incorretamente revertido para o caixa único no encerramento do exercício.
 
@@ -37,22 +37,25 @@ Memo: Operação de correção, para todos os fins a descrição sempre deveria 
 
 ## Evento
 
-A partir de jan/2012 foi decidido que as fontes devem identificar apenas se trata-se de recurso com destinação específica ou não, sendo o responsável pela arrecadação controlado a partir da unidade orçamentária.
+A partir de jan/2013 foi decidido que as fontes devem identificar apenas se trata-se de recurso com destinação específica ou não, sendo o responsável pela arrecadação controlado a partir da unidade orçamentária.
 
 Memo: Transposição total / account mapping / exists [60->10; 61->20]
 
 ## Evento
 
-A partir de jan/2013 a fonte 10 deve ser chamada de “recursos não vinculados”.
+A partir de jan/2014 a fonte 10 deve ser chamada de “recursos não vinculados”.
 
 ## Evento
 
-A partir de jan/2014 devido ao Programa de Ajuste Fiscal foi identificado a necessidade de se identificar na despesa se os recursos vinculados são provenientes da administração direta ou indireta. Portanto a fonte 20 foi dividida nas fontes 21 e 22.
+A partir de jan/2015 devido ao Programa de Ajuste Fiscal foi identificado a necessidade de se identificar na despesa se os recursos vinculados são provenientes da administração direta ou indireta. Portanto a fonte 20 foi dividida nas fontes 21 e 22.
 
 Memo: Transposição total  / account split / not exists [20->21; 20->22]
 
 ## Evento
 
-A partir de jan/2016 com o fim do Programa de Ajuste Fiscal as fontes 21 e 22 foram novamente consolidadas em uma nova fonte 23.
+A partir de jan/2017 com o fim do Programa de Ajuste Fiscal as fontes 21 e 22 foram novamente consolidadas em uma nova fonte 23.
 
 Memo: Transposição total / account merge / not exists [21->23; 22-:23]
+
+
+- desmembramento de codigos
