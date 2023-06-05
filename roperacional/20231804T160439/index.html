@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.3.361">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -89,7 +89,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -274,23 +275,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="resultado" class="level2">
 <h2 class="anchored" data-anchor-id="resultado">Resultado</h2>
 <p>Após seguir os passos anteriores e dar o comando <code>ctrl R</code> no script do qlikview para leitura das bases, o resultado será uma única tabela de dados empilhada, que pode ser verificada por meio do comando <code>ctrl T</code>, vide figura a seguir:</p>
-<p>[<img src="figuras/base_empilhada.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/base_empilhada.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 </section>
 <section id="criação-de-dashboards-no-método-de-empilhamento-das-bases-concatenate" class="level2">
 <h2 class="anchored" data-anchor-id="criação-de-dashboards-no-método-de-empilhamento-das-bases-concatenate">Criação de <em>dashboards</em> no método de empilhamento das bases (Concatenate):</h2>
 <p>Com as bases lidas, dentro da aba de criação de <em>dashboards</em> no qlikview, o próximo passo é inserir <code>Novo Objeto de Pasta</code> do tipo <code>Lista</code> para objetos de filtro e <code>Gráfico</code>/<code>Tabela Simples</code> para criação da Tabela com os dados desejados.</p>
 <p>No exemplo foi criada a Tabela 1 em que são visualizados dados de 2022 de Crédito Orçamentário, Cota Aprovada, Despesa Empenhada e Despesa Liquidada, por Unidade Orçamentária, Grupo de Despesa, Fonte de Recursos e Procedência. E como filtro, as dimensões Unidade Orçamentária (UO_COD), Ação (ACAO_COD), Grupo de Despesa (GRUPO_COD), Elemento Item de Despesa (ELEMENTO_ITEM_COD) e Número do Contrato (CONTRATO_NUMERO).</p>
-<p>[<img src="figuras/concatenate_painel.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/concatenate_painel.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 </section>
 <section id="utilização-dos-filtros-e-resultados-no-método-de-empilhamento-concatenate" class="level2">
 <h2 class="anchored" data-anchor-id="utilização-dos-filtros-e-resultados-no-método-de-empilhamento-concatenate">Utilização dos filtros e resultados no método de empilhamento (concatenate)</h2>
 <p>Nos campos de filtro é possível se fazer a seleção desejada nos dados. Quando se filtra por dimensões existentes em todas as bases, como no exemplo, UO_COD, ACAO_COD ou GRUPO_COD, a tabela retorna valores desejados.</p>
-<p>[<img src="figuras/concatenate_filtro-1.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/concatenate_filtro-1.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 <p>Contudo, quando se filtra por alguma dimensão não existente em alguma das bases da Tabela 1, seus dados retornam zerados. Neste exemplo, ao se filtrar por Elemento Item, os dados de Crédito Inicial e Autorizado retornam zero, por suas bases não conterem esta dimensão.</p>
-<p>[<img src="figuras/concatenate_filtro-2.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/concatenate_filtro-2.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 <p>A visualização mais informativa neste caso seria o retorno do Crédito Inicial e Autorizado na estrutura orçamentária em que houve a execução de despesas no Elemento Item selecionado; neste exemplo, UO_COD = 1501, ACAO_COD = 2500 e GRUPO_COD = 3.</p>
 <p>O mesmo problema ocorre ao filtramos por algum contrato. Neste caso, além do Crédito Inicial e Autorizado, a Cota Aprovada também retorna zero, pois inexiste essa dimensão nas bases a que pertencem. Do mesmo modo, a visualização desejada seria o retorno dos dados de Crédito Inicial e Autorizado e Cota Aprovada, na estrutura orçamentária em que houve a execução da despesa no contrato selecionado.</p>
-<p>[<img src="figuras/concatenate_filtro-3.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/concatenate_filtro-3.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 </section>
 </section>
 <section id="relacionamento-de-bases-por-linktable-no-qlikview" class="level1">
@@ -484,21 +510,46 @@ FROM
 <section id="resultado-1" class="level2">
 <h2 class="anchored" data-anchor-id="resultado-1">Resultado</h2>
 <p>Após seguir os passos anteriores e dar o comando <code>ctrl R</code> no script do qlikview, o resultado serão uma única tabela dimensão ligada as tabelas fato por meio de chaves, verificada por meio do comando <code>ctrl T</code>, conforme figura a seguir:</p>
-<p>[<img src="figuras/linktable.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/linktable.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 </section>
 <section id="criação-de-dashboards-no-método-linktable" class="level2">
 <h2 class="anchored" data-anchor-id="criação-de-dashboards-no-método-linktable">Criação de <em>dashboards</em> no método <em>Linktable</em>:</h2>
 <p>De maneira análoga ao exemplo anterior de empilhamento de bases, foram utilizados os mesmos campos para criação da Tabela 2 e os filtros. Os dados totais sem filtro são exatamente iguais aos da Tabela 1.</p>
-<p>[<img src="figuras/linktable_painel.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/linktable_painel.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 </section>
 <section id="utilização-dos-filtros-e-resultados-no-método-linktable" class="level2">
 <h2 class="anchored" data-anchor-id="utilização-dos-filtros-e-resultados-no-método-linktable">Utilização dos filtros e resultados no método <em>linktable</em></h2>
 <p>Ao se filtrar por alguma dimensão comum entre todas as bases das variáveis que compõem a Tabela 2, o resultado é o mesmo da Tabela 1, retornando dados corretamente.</p>
-<p>[<img src="figuras/linktable_filtro-1.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/linktable_filtro-1.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 <p>A diferença entre o método de empilhamento e o linktable ocorre ao se filtrar por alguma dimensão que inexiste em alguma das bases das variáveis que compõem a Tabela 2. Neste Caso, diferente do exemplo da Tabela 1, ao se filtrar por exemplo por Elemento Item, os dados de Crédito Inicial e Autorizado retornarão dados da estrutura orçamentária em que a houve Execução de Despesa, e/ou Aprovação de Cota.</p>
-<p>[<img src="figuras/linktable_filtro-2.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/linktable_filtro-2.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 <p>O mesmo ocorre quando se filtra por algum contrato, em que haverá o retorno de dados de Crédito Inicial e Autorizado e Cota Aprovada na estrutura orçamentária em que a Execução da Despesa nesse contrato ocorreu.</p>
-<p>[<img src="figuras/linktable_filtro-3.png" class="img-fluid" alt="base empilhada">].</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/linktable_filtro-3.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">base empilhada</figcaption>
+</figure>
+</div>
 
 
 </section>
