@@ -135,7 +135,7 @@ drop table execucao_temp;
 
 Após seguir os passos anteriores e dar o comando `ctrl R` no script do qlikview para leitura das bases, o resultado será uma única tabela de dados empilhada, que pode ser verificada por meio do comando `ctrl T`, vide figura a seguir:
 
- [![base empilhada](figuras/base_empilhada.png)].
+ ![base empilhada](figuras/base_empilhada.png)
 
 ## Criação de *dashboards* no método de empilhamento das bases (Concatenate):
 
@@ -143,24 +143,24 @@ Com as bases lidas, dentro da aba de criação de *dashboards* no qlikview, o pr
 
 No exemplo foi criada a Tabela 1 em que são visualizados dados de 2022 de Crédito Orçamentário, Cota Aprovada, Despesa Empenhada e Despesa Liquidada, por Unidade Orçamentária, Grupo de Despesa, Fonte de Recursos e Procedência. E como filtro, as dimensões Unidade Orçamentária (UO_COD), Ação (ACAO_COD), Grupo de Despesa (GRUPO_COD), Elemento Item de Despesa (ELEMENTO_ITEM_COD) e Número do Contrato (CONTRATO_NUMERO).
 
- [![base empilhada](figuras/concatenate_painel.png)].
+ ![base empilhada](figuras/concatenate_painel.png)
 
 ## Utilização dos filtros e resultados no método de empilhamento (concatenate)
 
 Nos campos de filtro é possível se fazer a seleção desejada nos dados. Quando se filtra por dimensões existentes em todas as bases, como no exemplo, UO_COD, ACAO_COD ou GRUPO_COD, a tabela retorna valores desejados.
 
-[![base empilhada](figuras/concatenate_filtro-1.png)].
+![base empilhada](figuras/concatenate_filtro-1.png)
 
 Contudo, quando se filtra por alguma dimensão não existente em alguma das bases da Tabela 1, seus dados retornam zerados. Neste exemplo, ao se filtrar por Elemento Item, os dados de Crédito Inicial e Autorizado retornam zero, por suas bases não conterem esta dimensão.
 
-[![base empilhada](figuras/concatenate_filtro-2.png)].
+![base empilhada](figuras/concatenate_filtro-2.png)
 
 A visualização mais informativa neste caso seria o retorno do Crédito Inicial e Autorizado na estrutura orçamentária em que houve a execução de despesas no Elemento Item selecionado; neste exemplo, UO_COD = 1501, ACAO_COD = 2500 e GRUPO_COD = 3.
 
 O mesmo problema ocorre ao filtramos por algum contrato. Neste caso, além do Crédito Inicial e Autorizado, a Cota Aprovada também retorna zero, pois inexiste essa dimensão nas bases a que pertencem.
 Do mesmo modo, a visualização desejada seria o retorno dos dados de Crédito Inicial e Autorizado e Cota Aprovada, na estrutura orçamentária em que houve a execução da despesa no contrato selecionado.
 
-[![base empilhada](figuras/concatenate_filtro-3.png)].
+![base empilhada](figuras/concatenate_filtro-3.png)
 
 # Relacionamento de bases por *Linktable* no qlikview:
 
@@ -370,25 +370,25 @@ FROM
 
 Após seguir os passos anteriores e dar o comando `ctrl R` no script do qlikview, o resultado serão uma única tabela dimensão ligada as tabelas fato por meio de chaves, verificada por meio do comando `ctrl T`, conforme figura a seguir:
 
-[![base empilhada](figuras/linktable.png)].
+![base empilhada](figuras/linktable.png)
 
 ## Criação de *dashboards* no método *Linktable*:
 
 De maneira análoga ao exemplo anterior de empilhamento de bases, foram utilizados os mesmos campos para criação da Tabela 2 e os filtros. Os dados totais sem filtro são exatamente iguais aos da Tabela 1.
 
- [![base empilhada](figuras/linktable_painel.png)].
+![base empilhada](figuras/linktable_painel.png)
 
 ## Utilização dos filtros e resultados no método *linktable*
 
 Ao se filtrar por alguma dimensão comum entre todas as bases das variáveis que compõem a Tabela 2, o resultado é o mesmo da Tabela 1, retornando dados corretamente.
 
 
-[![base empilhada](figuras/linktable_filtro-1.png)].
+![base empilhada](figuras/linktable_filtro-1.png)
 
 A diferença entre o método de empilhamento e o linktable ocorre ao se filtrar por alguma dimensão que inexiste em alguma das bases das variáveis que compõem a Tabela 2. Neste Caso, diferente do exemplo da Tabela 1, ao se filtrar por exemplo por Elemento Item, os dados de Crédito Inicial e Autorizado retornarão dados da estrutura orçamentária em que a houve Execução de Despesa, e/ou Aprovação de Cota.
 
-[![base empilhada](figuras/linktable_filtro-2.png)].
+![base empilhada](figuras/linktable_filtro-2.png)
 
 O mesmo ocorre quando se filtra por algum contrato, em que haverá o retorno de dados de Crédito Inicial e Autorizado e Cota Aprovada na estrutura orçamentária em que a Execução da Despesa nesse contrato ocorreu.
 
-[![base empilhada](figuras/linktable_filtro-3.png)].
+![base empilhada](figuras/linktable_filtro-3.png)
