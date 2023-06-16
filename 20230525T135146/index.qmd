@@ -3,3 +3,191 @@ title: Atos e fatos
 author: Francisco
 ---
 
+```{r}
+library(execucao); library(data.table); library(relatorios)
+
+trend <- function(data) {
+
+  data[, .(VL_EFET_AJUST = sum(VL_EFET_AJUST)), .(ANO, FONTE_COD)] |> 
+  dcast(ANO ~ FONTE_COD, value.var = "VL_EFET_AJUST")
+    
+}
+```
+
+```{r}
+data("exec_rec")
+exec_rec <- exec_rec[FONTE_COD %in% c(10, 26, 28, 31, 32, 33, 34, 59,60, 61, 72, 77, 81, 82, 
+83, 94)]
+
+exec_rec[, sum(VL_EFET_AJUST), .(ANO, FONTE_COD)] |> dcast(FONTE_COD ~ ANO, value.var = "V1") |> View()
+```
+
+## Narrativa
+
+- Fontes 60|61 (split-off)
+- Fonte 72 (creation)
+- Fontes 28|77 (take-over)
+- Fontes 34|82|83 (breakdown)
+- Fonte 81 (deletion)
+- Fontes 31|32|33 (merger)
+- Fontes 26|94 (split-off)
+
+## A.1 DELETION
+
+> A Classification Item expires, while its denotation reduces to zero; it does not proceed as (part of the) denotation of one or more other (existing) Classification Items.
+
+## Fonte 81
+
+Qual a data de extinção, quando não existe arrecadação? Ainda é possível haver execução da despesa? É analiticamente útil saber que a fonte 81 (criada no ato 18 em 04/08/2015) não é mais utilizada.
+
+```{r}
+exec_rec[FONTE_COD == 81] |> trend()
+```
+
+## A.2 CREATION
+
+> The mirror image of deletion: a Classification Item emerges, while its denotation is not (part of) the denotation of one or more existing Classification Items.
+
+### Fonte 72
+
+Em 24/05/2012 é criada a fonte de recursos 72 – Taxa de Fiscalização de Recursos Minerários.
+
+```{r}
+exec_rec[FONTE_COD == 72] |> trend()
+```
+
+## A.3.1 MERGER
+
+> Two or more Classification Items expire, while their denotations proceed in one emerging Classification Item. 
+
+### Fontes 31|32|33
+
+As compensações financeiras das fontes 31, 32 e 33 são agrupadas em uma nova fonte.
+
+```{r}
+exec_rec[FONTE_COD %in% 31:33] |> trend()
+```
+
+Memo: Evento fictício
+
+## A.3.2 TAKE-OVER
+
+> A Classification Item expires, while its denotation proceeds as part of the denotation of another Classification Item, which continues its existence. 
+
+### Fontes 28|77
+
+A fonte 77 foi criada em 22/11/2013, mas somente em 2014 a totalidade dos recursos da fonte 28 foram arrecadados nela.
+
+```{r}
+exec_rec[FONTE_COD %in% c(28, 77)] |> trend()
+```
+
+## A.4.1 BREAKDOWN
+
+> The mirror image of merger: a Classification Item expires, while its denotation is distributed over and proceeds in two or more emerging Classification Items. 
+
+### Fontes 34|82|83
+
+NOTIFICAÇÃO DE INFRAÇÃO DE TRÂNSITO - Ato 21 22/09/2015
+
+```{r}
+exec_rec[FONTE_COD %in% c(34, 82, 83)] |> trend()
+```
+
+## A.4.2 SPLIT OFF
+
+> The mirror image of take-over: a Classification Item continues to exist, while part of its denotation moves to another (emerging) Classification Item. 
+
+### Fontes 60|61 (split-off or transfer)
+
+Em 01/08/2004 foi criada a fonte 61 para a loa 2005 com a fonte de recurso 61.
+
+Diferentemente do evento das fontes 26|94 a fonte 60 manteve o nome
+
+```{r}
+exec_rec[FONTE_COD == 61] |> trend()
+loa_rec[FONTE_COD == 61, sum(VL_LOA_REC), ANO]
+```
+
+Naturezas de receita que foram classificadas na fonte 60 e fonte 61
+
+```{r}
+exec_rec[FONTE_COD %in% 60:61, .N, .(RECEITA_COD, FONTE_COD)][, .N, RECEITA_COD][N>1]
+```
+
+A fonte 61 foi criada devido a receitas especificas estaduais
+
+```{r}
+exec_rec[nat(RECEITA_COD, 19900906, 19908006, 19900907, 19908007, 19900908, 19908008), sum(VL_EFET_AJUST), .(ANO, RECEITA_COD, RECEITA_DESC, FONTE_COD)]
+```
+
+Mas eventualmente podem haver mudanças, como por exemplo as receitas de unidades penais
+
+```{r}
+exec_rec[nat(RECEITA_COD, 1420010000, 1520990100)]
+```
+
+
+### Fontes 26|94
+
+Ato 55 26/11/2018 taxa florestal
+
+```{r}
+exec_rec[FONTE_COD %in% c(26, 94)] |> trend()
+```
+
+## A.5 TRANSFER
+
+> Part of the denotation of a Classification Item moves to another (existing) Classification Item 
+
+### Fontes 59, 61
+
+```{r}
+exec_rec[UO_COD == 4111 & FONTE_COD %in% c(59, 61)]
+```
+
+## B.1 CODE CHANGE
+
+> A Classification Item expires, while its denotation proceeds as the denotation of an emerging Classification Item. 
+
+### Ementário de receita da União
+
+### Alteração da codificação para o GRP
+
+## B.2 NAME CHANGE
+
+> The name of a Classification Item changes, while its denotation remains the same.
+
+### Correção na acentuação de uma classificação
+
+### Recursos ordinários -> Recursos não vinculados 
+
+## A Classificar
+
+### FUNDEF/FUNDEB
+
+### Contribuições previdênciárias FUNFIP/FUNPEMG
+
+### Convênios, Acordos e Ajustes
+
+```{r}
+exec_rec[FONTE_COD %in% c(24, 70, 73, 74)] |> trend()
+```
+
+### Transferências do SUS
+
+Ato 21 22/09/2015
+Ato 25 29/02/2016
+
+```{r}
+exec_rec[FONTE_COD %in% c(22, 37, 84:88, 92, 93)] |> trend()
+```
+
+### Fontes 10, 15 (split off)
+
+### Fonte 35 (deletion)
+
+```{r}
+exec_rec[FONTE_COD == 35] |> trend()
+```
+
