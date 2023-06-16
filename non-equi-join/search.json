@@ -11,7 +11,7 @@
     "href": "20230327T162719/index.html#criação-insert",
     "title": "Gestão de dados de referência",
     "section": "Criação (insert)",
-    "text": "Criação (insert)\n\n\nO classificador inicial foi populado com as fontes de recurso 10, 20 e 60.\nAs colunas id, created_at e updated_at devem idealmente ser geradas de forma automática para tornar o preenchimento mais ágil e menos sujeito a erros. Elas não serão mostradas a menos que necessário.\n\n\n\n\n\n\nid\ncode\ndescription\nvalid_from\nvalid_to\ncreated_at\nupdated_at\n\n\n\n\n1\n10\nRecursos Ordinarios\n0001-01-01\n9999-12-31\n2023-06-06 17:00:27\n2023-06-06 17:00:27\n\n\n2\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n2023-06-06 17:00:27\n2023-06-06 17:00:27\n\n\n3\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n9999-12-31\n2023-06-06 17:00:27\n2023-06-06 17:00:27"
+    "text": "Criação (insert)\n\n\nO classificador inicial foi populado com as fontes de recurso 10, 20 e 60.\nAs colunas id, created_at e updated_at devem idealmente ser geradas de forma automática para tornar o preenchimento mais ágil e menos sujeito a erros. Elas não serão mostradas a menos que necessário.\n\n\n\n\n\n\nid\ncode\ndescription\nvalid_from\nvalid_to\ncreated_at\nupdated_at\n\n\n\n\n1\n10\nRecursos Ordinarios\n0001-01-01\n9999-12-31\n2023-06-16 14:28:32\n2023-06-16 14:28:32\n\n\n2\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n2023-06-16 14:28:32\n2023-06-16 14:28:32\n\n\n3\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n9999-12-31\n2023-06-16 14:28:32\n2023-06-16 14:28:32"
   },
   {
     "objectID": "20230327T162719/index.html#transposição-parcial-insert",
@@ -32,7 +32,7 @@
     "href": "20230327T162719/index.html#bloqueio-e-transposição-total-update",
     "title": "Gestão de dados de referência",
     "section": "Bloqueio e transposição total (update)",
-    "text": "Bloqueio e transposição total (update)\n\n\nA partir de jan/2022 foi decidido que as fontes devem identificar apenas se trata-se de recurso com destinação específica ou não, sendo o responsável pela arrecadação controlado a partir da unidade orçamentária.\n\n\n\n\n\n\nid\ncode\ndescription\nvalid_from\nvalid_to\ncreated_at\nupdated_at\n\n\n\n\n1\n10\nRecursos Ordinários\n0001-01-01\n9999-12-31\n2023-06-06 17:00:27\n2023-06-06 17:00:28.345\n\n\n2\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n2023-06-06 17:00:27\n2023-06-06 17:00:27\n\n\n3\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n2022-01-01\n2023-06-06 17:00:27\n2023-06-06 17:00:28.426\n\n\n4\n61\nRecursos Diretamente Arrecadados Vinculados\n2021-06-01\n2022-01-01\n2023-06-06 17:00:28\n2023-06-06 17:00:28.427"
+    "text": "Bloqueio e transposição total (update)\n\n\nA partir de jan/2022 foi decidido que as fontes devem identificar apenas se trata-se de recurso com destinação específica ou não, sendo o responsável pela arrecadação controlado a partir da unidade orçamentária.\n\n\n\n\n\n\nid\ncode\ndescription\nvalid_from\nvalid_to\ncreated_at\nupdated_at\n\n\n\n\n1\n10\nRecursos Ordinários\n0001-01-01\n9999-12-31\n2023-06-16 14:28:32\n2023-06-16 14:28:33.412\n\n\n2\n20\nRecursos Vinculados\n0001-01-01\n9999-12-31\n2023-06-16 14:28:32\n2023-06-16 14:28:32\n\n\n3\n60\nRecursos Diretamente Arrecadados\n0001-01-01\n2022-01-01\n2023-06-16 14:28:32\n2023-06-16 14:28:33.468\n\n\n4\n61\nRecursos Diretamente Arrecadados Vinculados\n2021-06-01\n2022-01-01\n2023-06-16 14:28:33\n2023-06-16 14:28:33.470"
   },
   {
     "objectID": "20230327T162719/index.html#descrição-update",
@@ -75,75 +75,5 @@
     "title": "Gestão de dados de referência",
     "section": "Operadores lógicos",
     "text": "Operadores lógicos\n\ncri - criado sem reaproveitamento\ncri-r - criado com reaproveitamento (reativação de código)\ndoc - documentação [alterada] (obs.: inclui todos os demais grupos de informação, ex.: interpretação, notas etc)\ndsc - descrição [alterada]\ndsc-doc - descrição e documentação [alterados]\ndsc-n - descrição e nível [alterados]\nnv - nível [alterado]\nblq - bloqueado\ndsbq - desbloqueado\ntpd - transposição parcial de\ntpp - transposição parcial para\nttd - transposição total de\nttp - transposição total para [cod. fica bloqueado]\n\n\ndbDisconnect(conn)"
-  },
-  {
-    "objectID": "20230525T135146/index.html",
-    "href": "20230525T135146/index.html",
-    "title": "Atos e fatos",
-    "section": "",
-    "text": "Quando? 01/04/2001\nO classificador inicial com vigência a partir de janeiro de 2002 foi populado com as fontes de recurso 10, 20 e 60.\n\nThe mirror image of deletion: a Classification Item emerges, while its denotation is not (part of) the denotation of one or more existing Classification Items."
-  },
-  {
-    "objectID": "20230525T135146/index.html#a.2-creation-01",
-    "href": "20230525T135146/index.html#a.2-creation-01",
-    "title": "Atos e fatos",
-    "section": "",
-    "text": "Quando? 01/04/2001\nO classificador inicial com vigência a partir de janeiro de 2002 foi populado com as fontes de recurso 10, 20 e 60.\n\nThe mirror image of deletion: a Classification Item emerges, while its denotation is not (part of) the denotation of one or more existing Classification Items."
-  },
-  {
-    "objectID": "20230525T135146/index.html#a.3.2-take-over",
-    "href": "20230525T135146/index.html#a.3.2-take-over",
-    "title": "Atos e fatos",
-    "section": "A.3.2 TAKE-OVER",
-    "text": "A.3.2 TAKE-OVER\nQuando? 01/04/2001\nA fonte 60 foi bloqueada a partir de janeiro de 2010. A orientação é que os recursos da administração direta devem ser classificados na fonte 10 e os recursos da administração indireta que possuem vinculação especifica (como a fonte 60 do setor saúde) devem ser classificados na fonte 20.\nMemo: Transposição total / account split / exists [60-&gt;10; 60-&gt;20]\n\nA Classification Item expires, while its denotation proceeds as part of the denotation of another Classification Item, which continues its existence."
-  },
-  {
-    "objectID": "20230525T135146/index.html#a.5-transfer-mn",
-    "href": "20230525T135146/index.html#a.5-transfer-mn",
-    "title": "Atos e fatos",
-    "section": "A.5 TRANSFER (M:N)",
-    "text": "A.5 TRANSFER (M:N)\n\nPart of the denotation of a Classification Item moves to another (existing) Classification Item\n\nA partir de jan/2011 a fonte 60 foi desbloqueada após pressão de órgãos da administração direta. Ela ficou bloqueada durante o exercício de 2010 e não teve contabilização de arrecadação.\nA FHEMIG manteve sua arrecadação na fonte 20.\nMemo: Desbloqueio e transposição parcial [10-&gt;60; 20-&gt;60]"
-  },
-  {
-    "objectID": "20230525T135146/index.html#evento",
-    "href": "20230525T135146/index.html#evento",
-    "title": "Atos e fatos",
-    "section": "Evento",
-    "text": "Evento\nEm jan/2012 foi criada a fonte de recurso 61 - Recursos Diretamente Arrecadados Vinculados.\nO objetivo é permitir a identificação de recursos diretamente arrecadados que possuem vinculação específica para evitar que o saldo financeiro dessas fontes fosse incorretamente revertido para o caixa único no encerramento do exercício.\nMemo: Transposição parcial [60-&gt;61]"
-  },
-  {
-    "objectID": "20230525T135146/index.html#b.2-name-change-11",
-    "href": "20230525T135146/index.html#b.2-name-change-11",
-    "title": "Atos e fatos",
-    "section": "B.2 NAME CHANGE (1:1)",
-    "text": "B.2 NAME CHANGE (1:1)\n\nThe name of a Classification Item changes, while its denotation remains the same\n\nNa inicialização do classificador foi identificado que a descrição da fonte 10 foi incorretamente digitada sem acento.\nMemo: Operação de correção, para todos os fins a descrição sempre deveria ter sido “Recursos Ordinários”"
-  },
-  {
-    "objectID": "20230525T135146/index.html#evento-1",
-    "href": "20230525T135146/index.html#evento-1",
-    "title": "Atos e fatos",
-    "section": "Evento",
-    "text": "Evento\nA partir de jan/2013 foi decidido que as fontes devem identificar apenas se trata-se de recurso com destinação específica ou não, sendo o responsável pela arrecadação controlado a partir da unidade orçamentária.\nMemo: Transposição total / account mapping / exists [60-&gt;10; 61-&gt;20]"
-  },
-  {
-    "objectID": "20230525T135146/index.html#evento-2",
-    "href": "20230525T135146/index.html#evento-2",
-    "title": "Atos e fatos",
-    "section": "Evento",
-    "text": "Evento\nA partir de jan/2014 a fonte 10 deve ser chamada de “recursos não vinculados”."
-  },
-  {
-    "objectID": "20230525T135146/index.html#evento-3",
-    "href": "20230525T135146/index.html#evento-3",
-    "title": "Atos e fatos",
-    "section": "Evento",
-    "text": "Evento\nA partir de jan/2015 devido ao Programa de Ajuste Fiscal foi identificado a necessidade de se identificar na despesa se os recursos vinculados são provenientes da administração direta ou indireta. Portanto a fonte 20 foi dividida nas fontes 21 e 22.\nMemo: Transposição total / account split / not exists [20-&gt;21; 20-&gt;22]"
-  },
-  {
-    "objectID": "20230525T135146/index.html#evento-4",
-    "href": "20230525T135146/index.html#evento-4",
-    "title": "Atos e fatos",
-    "section": "Evento",
-    "text": "Evento\nA partir de jan/2017 com o fim do Programa de Ajuste Fiscal as fontes 21 e 22 foram novamente consolidadas em uma nova fonte 23.\nMemo: Transposição total / account merge / not exists [21-&gt;23; 22-:23]\n\ndesmembramento de codigos"
   }
 ]
