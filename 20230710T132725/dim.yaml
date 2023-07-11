@@ -1,0 +1,6 @@
+name: dim
+path: data-raw/dim.txt
+format: csv
+encoding: windows-1252
+dialect: dialect.yaml
+schema: schemas/dim.yaml

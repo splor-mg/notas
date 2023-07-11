@@ -1,0 +1,108 @@
+{
+  "name": "package",
+  "profile": "tabular-data-package",
+  "resources": [
+    {
+      "name": "fact",
+      "type": "table",
+      "profile": "tabular-data-resource",
+      "path": "data/fact.csv",
+      "scheme": "file",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "hash": "sha256:558664fbd74fb7bf3fc44850ba73fe40cbdbb6fa7f3186872cd57c2961a1ecb3",
+      "bytes": 139,
+      "fields": 6,
+      "rows": 3,
+      "schema": {
+        "fields": [
+          {
+            "name": "id",
+            "type": "integer",
+            "source": "Número Empenho"
+          },
+          {
+            "name": "uo_cod",
+            "type": "integer",
+            "source": "Unidade Orçamentária - Código"
+          },
+          {
+            "name": "fonte_cod",
+            "type": "integer"
+          },
+          {
+            "name": "vl_emp",
+            "type": "number",
+            "source": "Valor Despesa Empenhada"
+          },
+          {
+            "name": "hist",
+            "type": "string",
+            "source": "Histórico"
+          },
+          {
+            "name": "valid_ref",
+            "type": "string"
+          }
+        ],
+        "primaryKey": [],
+        "foreignKeys": []
+      }
+    },
+    {
+      "name": "dim",
+      "type": "table",
+      "profile": "tabular-data-resource",
+      "path": "data/dim.csv",
+      "scheme": "file",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "hash": "sha256:696294aa7dd7e1b66818b8c69905e58c0b55c41c805db02ed85826ea78fbdfe0",
+      "bytes": 299,
+      "fields": 6,
+      "rows": 4,
+      "schema": {
+        "fields": [
+          {
+            "name": "uo_cod",
+            "type": "integer",
+            "constraints": {
+              "required": true
+            },
+            "source": "Unidade Orçamentária - Código"
+          },
+          {
+            "name": "uo_desc",
+            "type": "string",
+            "source": "Unidade Orçamentária - Descrição"
+          },
+          {
+            "name": "valid",
+            "type": "boolean",
+            "source": "Vigente?"
+          },
+          {
+            "name": "valid_from",
+            "type": "date",
+            "source": "VALID_FROM"
+          },
+          {
+            "name": "valid_to",
+            "type": "date",
+            "description": "This is a big and nice description\n"
+          },
+          {
+            "name": "data_de_atualizacao",
+            "type": "datetime",
+            "source": "Data de Atualização"
+          }
+        ],
+        "primaryKey": [],
+        "foreignKeys": []
+      }
+    }
+  ],
+  "updated_at": "2023-07-11T18:20:48"
+}
