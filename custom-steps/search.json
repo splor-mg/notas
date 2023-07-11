@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Base de conhecimento - Assessoria de Dados SPLOR",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\nDescription\n\n\nCategories\n\n\n\n\n\n\nundefined\n\n\nsteps\n\n\n\n\n\n\n\n\nundefined\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "20230710T132725/index.html",
+    "href": "20230710T132725/index.html",
+    "title": "steps",
+    "section": "",
+    "text": "steps\npython scripts/init.py \npython scripts/normalize_resource.py transform dim\npython scripts/normalize_resource.py transform fact\npython scripts/normalize_resource.py build\npython scripts/enrich_resource.py \n+----------------+-------------------------------+----------+-----------+--------------------------------+-------------------------+---------------------+-----------+\n| Número Empenho | Unidade Orçamentária - Código | uo_sigla | fonte_cod | fonte_desc                     | Valor Despesa Empenhada | Histórico           | valid_ref |\n+================+===============================+==========+===========+================================+=========================+=====================+===========+\n|              1 |                          1501 | 'SEPLAG' |        10 | 'RECURSOS ORDINARIOS'          |          Decimal('120') | 'Diárias de Viagem' | '2023-01' |\n+----------------+-------------------------------+----------+-----------+--------------------------------+-------------------------+---------------------+-----------+\n|              2 |                          1251 | None     |        24 | 'CONVENIOS, ACORDOS E AJUSTES' |       Decimal('1000.5') | None                | '2002-00' |\n+----------------+-------------------------------+----------+-----------+--------------------------------+-------------------------+---------------------+-----------+\n|              3 |                          1251 | None     |        23 | None                           |       Decimal('2000.5') | ''                  | '2023-01' |\n+----------------+-------------------------------+----------+-----------+--------------------------------+-------------------------+---------------------+-----------+"
+  }
+]
