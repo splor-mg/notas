@@ -1,0 +1,14 @@
+name: package
+resources:
+  - name: fact
+    path: data-raw/fact.txt
+    format: csv
+    encoding: windows-1252
+    dialect: dialect.yaml
+    schema: schemas/fact.yaml
+  - name: dim
+    path: data-raw/dim.txt
+    format: csv
+    encoding: windows-1252
+    dialect: dialect.yaml
+    schema: schemas/dim.yaml

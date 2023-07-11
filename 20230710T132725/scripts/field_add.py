@@ -1,5 +1,5 @@
 from frictionless import Resource
-from pipeline import pipeline
+from scripts.pipeline import pipeline
 
 source = Resource('fact.yaml')
 

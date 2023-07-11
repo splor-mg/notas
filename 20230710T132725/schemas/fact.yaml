@@ -1,0 +1,31 @@
+fields:
+  - name: Número Empenho
+    target: id
+    type: integer
+  - name: Unidade Orçamentária - Código
+    target: uo_cod
+    type: integer
+  - name: fonte_cod
+    type: integer
+  - name: Valor Despesa Empenhada
+    target: vl_emp
+    type: number
+    decimalChar: ','
+    groupChar: '.'
+    bareNumber: false
+  - name: Histórico
+    target: hist
+    type: string
+    missingValues: 
+      - 'NA'
+  - name: valid_ref
+    type: string
+primaryKey:
+  - Número Empenho
+foreignKeys:
+  - fields:
+      - Unidade Orçamentária - Código
+    reference:
+      fields:
+        - Unidade Orçamentária - Código
+      resource: dim
