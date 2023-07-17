@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "20230717T153404/index.html",
+    "href": "20230717T153404/index.html",
+    "title": "Non-Equi-Joins and temporal tables",
+    "section": "",
+    "text": "library(RSQLite); library(knitr)\n\ncon &lt;- dbConnect(RSQLite::SQLite(), \":memory:\")\nSQL joins play a pivotal role in data analysis by facilitating data combination from multiple tables. While most SQL users are familiar with standard SQL joins like INNER JOIN, LEFT JOIN, RIGHT JOIN, and FULL JOIN, which use equality-based joining conditions, there is a more advanced yet lesser-known technique called the non-equi-join. Non-equi-joins allow us to merge tables based on inequality conditions or ranges. This blog post will provide an introduction to non-equi-joins, focusing on their use in handling unitemporal data scenarios."
+  },
+  {
+    "objectID": "20230717T153404/index.html#what-are-non-equi-joins",
+    "href": "20230717T153404/index.html#what-are-non-equi-joins",
+    "title": "Non-Equi-Joins and temporal tables",
+    "section": "What are Non-Equi-Joins?",
+    "text": "What are Non-Equi-Joins?\nNon-equi-joins are SQL join operations where the join condition is not based solely on equality. They allow comparison operators such as less than (&lt;), less than or equal to (&lt;=), greater than (&gt;), and greater than or equal to (&gt;=). They are particularly useful when we need to combine data based on a range of values or any non-equality conditions."
+  },
+  {
+    "objectID": "20230717T153404/index.html#example",
+    "href": "20230717T153404/index.html#example",
+    "title": "Non-Equi-Joins and temporal tables",
+    "section": "Example",
+    "text": "Example\nOne common application of non-equi-joins is in dealing with temporal or time-dependent data. Suppose we have a scenario where a classification code’s meaning changes over time. In such a case, we may have a fact table with transactions recorded with a specific code and a reference date. A dimension table may store these codes’ descriptions, each valid for a particular period.\nLet’s consider the following data:\n\n\n\nfact &lt;- read.csv(\"fact.csv\")\ndbWriteTable(con, \"fact\", fact)\nkable(fact)\n\n\n\n\nid\nvalid_ref\ncod\nvalue\n\n\n\n\n1\n2023-00\n500\n5.0\n\n\n2\n2023-00\n501\n10.0\n\n\n3\n2023-02\n500\n7.5\n\n\n4\n2022-12\n503\n12.0\n\n\n\n\n\n\n\ndim &lt;- read.csv(\"dim.csv\")\ndbWriteTable(con, \"dim\", dim)\nkable(dim)\n\n\n\n\ncod\ndesc\nvalid_from\nvalid_to\n\n\n\n\n500\nRecursos Ordinários\n0001-00\n2023-02\n\n\n501\nRecursos Vinculados\n0001-00\n9999-12\n\n\n500\nRecursos Não vinculados\n2023-02\n2023-05\n\n\n503\nRecursos Diretamente Arrecadados\n2023-02\n9999-12\n\n\n\n\n\n\n\nIn this scenario, a non-equi-join allows us to find the correct description for each transaction’s code, based on the reference date. Here’s how you would achieve this in R using sqlite:\n\nquery &lt;- \"\nSELECT id, valid_ref, fact.cod as cod, dim.desc as desc, value\nFROM fact\nLEFT JOIN dim\nON fact.cod = dim.cod\nAND dim.valid_from &lt;= fact.valid_ref\nAND dim.valid_to &gt; fact.valid_ref\"\n\nkable(dbGetQuery(con, query))\n\n\n\n\nid\nvalid_ref\ncod\ndesc\nvalue\n\n\n\n\n1\n2023-00\n500\nRecursos Ordinários\n5.0\n\n\n2\n2023-00\n501\nRecursos Vinculados\n10.0\n\n\n3\n2023-02\n500\nRecursos Não vinculados\n7.5\n\n\n4\n2022-12\n503\nNA\n12.0"
+  },
+  {
+    "objectID": "20230717T153404/index.html#wrapping-up",
+    "href": "20230717T153404/index.html#wrapping-up",
+    "title": "Non-Equi-Joins and temporal tables",
+    "section": "Wrapping Up",
+    "text": "Wrapping Up\nA “non-equi join” it’s called like this because it uses inequalities in the join condition (valid_from &lt;= valid_ref AND valid_to &gt; valid_ref). This type of join is a powerful tool, but not all database systems or tools support it directly.\n\nSQL-based systems such as PostgreSQL, SQLite, and DuckDB do support non-equi joins.\nTraditional R data manipulation packages like base R, dplyr, and data.frame don’t directly support non-equi joins. However, the data.table package, which you’re using in your example, does support them.\nIn the Python ecosystem, pandas (a popular data manipulation library) does not directly support non-equi joins. But there are workarounds using methods like merge_asof and boolean indexing.\n\nSo, it’s not so much that non-equi joins are “special,” but rather that they are a more advanced feature that not all systems support.\nNon-equi joins be computationally expensive, especially for larger datasets. This is because they often cannot take advantage of optimizations that are possible with equi joins, where the join condition involves only equality operators (=).\n\ndbDisconnect(con)"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Base de conhecimento - Assessoria de Dados SPLOR",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\nDescription\n\n\nCategories\n\n\n\n\n\n\n\nundefined\n\n\nNon-Equi-Joins and temporal tables\n\n\nFrancisco \n\n\n\n\n\nundefined\n\n\n\n\n\n\nNo matching items"
+  }
+]
