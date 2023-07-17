@@ -1,0 +1,71 @@
+---
+title: Non-Equi-Joins and temporal tables 
+author: Francisco
+---
+
+```{R}
+library(RSQLite); library(knitr)
+
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+```
+
+SQL joins play a pivotal role in data analysis by facilitating data combination from multiple tables. While most SQL users are familiar with standard SQL joins like INNER JOIN, LEFT JOIN, RIGHT JOIN, and FULL JOIN, which use equality-based joining conditions, there is a more advanced yet lesser-known technique called the non-equi-join. Non-equi-joins allow us to merge tables based on inequality conditions or ranges. This blog post will provide an introduction to non-equi-joins, focusing on their use in handling unitemporal data scenarios.
+
+## What are Non-Equi-Joins?
+
+Non-equi-joins are SQL join operations where the join condition is not based solely on equality. They allow comparison operators such as less than (<), less than or equal to (<=), greater than (>), and greater than or equal to (>=). They are particularly useful when we need to combine data based on a range of values or any non-equality conditions.
+
+## Example
+
+One common application of non-equi-joins is in dealing with temporal or time-dependent data. Suppose we have a scenario where a classification code's meaning changes over time. In such a case, we may have a fact table with transactions recorded with a specific code and a reference date. A dimension table may store these codes' descriptions, each valid for a particular period.
+
+Let's consider the following data:
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+fact <- read.csv("fact.csv")
+dbWriteTable(con, "fact", fact)
+kable(fact)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+dim <- read.csv("dim.csv")
+dbWriteTable(con, "dim", dim)
+kable(dim)
+```
+:::
+::::
+
+In this scenario, a non-equi-join allows us to find the correct description for each transaction's code, based on the reference date. Here's how you would achieve this in R using sqlite:
+
+```{R}
+query <- "
+SELECT id, valid_ref, fact.cod as cod, dim.desc as desc, value
+FROM fact
+LEFT JOIN dim
+ON fact.cod = dim.cod
+AND dim.valid_from <= fact.valid_ref
+AND dim.valid_to > fact.valid_ref"
+
+kable(dbGetQuery(con, query))
+```
+
+## Wrapping Up
+
+A "non-equi join" it's called like this because it uses inequalities in the join condition (valid_from <= valid_ref AND valid_to > valid_ref). This type of join is a powerful tool, but not all database systems or tools support it directly.
+
+- SQL-based systems such as PostgreSQL, SQLite, and DuckDB do support non-equi joins.
+- Traditional R data manipulation packages like base R, dplyr, and data.frame don't directly support non-equi joins. However, the data.table package, which you're using in your example, does support them.
+- In the Python ecosystem, pandas (a popular data manipulation library) does not directly support non-equi joins. But there are workarounds using methods like merge_asof and boolean indexing.
+
+So, it's not so much that non-equi joins are "special," but rather that they are a more advanced feature that not all systems support. 
+
+Non-equi joins be computationally expensive, especially for larger datasets. This is because they often cannot take advantage of optimizations that are possible with equi joins, where the join condition involves only equality operators (=).
+
+```{R}
+dbDisconnect(con)
+```

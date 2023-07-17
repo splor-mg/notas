@@ -1,0 +1,5 @@
+cod,desc,valid_from,valid_to
+500,Recursos Ordinários,0001-00,2023-02
+501,Recursos Vinculados,0001-00,9999-12
+500,Recursos Não vinculados,2023-02,2023-05
+503,Recursos Diretamente Arrecadados,2023-02,9999-12
