@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "20230717T140058/index.html",
+    "href": "20230717T140058/index.html",
+    "title": "Generator function e Generator iterator na propriedade data de recursos no frictionless",
+    "section": "",
+    "text": "Usualmente recursos são criados com a propriedade path:\nfrom frictionless import Resource\nfrom rich import print_json\nfrom rich import print as rprint\n\nresource = Resource(name = 'my-resource', path = 'data.csv')\nprint_json(data = resource.read_rows())\n\n[\n  {\n    \"a\": 1,\n    \"b\": 2\n  },\n  {\n    \"a\": 3,\n    \"b\": 4\n  }\n]\nNo entanto, eles também podem ser criados com a propriedade data1\ndata = [\n    ['a', 'b'],\n    [1, 2],\n    [3, 4],\n]\n\nresource = Resource(name = 'my-resource', data = data)\nprint_json(data = resource.read_rows())\n\n[\n  {\n    \"a\": 1,\n    \"b\": 2\n  },\n  {\n    \"a\": 3,\n    \"b\": 4\n  }\n]\nmas não com as duas\ndata = [\n    ['a', 'b'],\n    [1, 2],\n    [3, 4],\n]\n\nresource = Resource(name = 'my-resource', path = 'data.csv', data = data)\nrprint(resource.validate())\n\n\nReport(\n    name=None,\n    title=None,\n    description=None,\n    valid=False,\n    stats={'tasks': 1, 'errors': 1, 'warnings': 0, 'seconds': 0.001},\n    warnings=[],\n    errors=[],\n    tasks=[\n        ReportTask(\n            name='my-resource',\n            type='table',\n            title=None,\n            description=None,\n            valid=False,\n            place='&lt;memory&gt;',\n            labels=[],\n            stats={'errors': 1, 'warnings': 0, 'seconds': 0.001},\n            warnings=[],\n            errors=[\n                ResourceError(\n                    message='The data resource has an error: properties \"path\" and \"data\" is mutually exclusive',\n                    note='properties \"path\" and \"data\" is mutually exclusive'\n                )\n            ]\n        )\n    ]\n)"
+  },
+  {
+    "objectID": "20230717T140058/index.html#generator-function-e-generator-iterator",
+    "href": "20230717T140058/index.html#generator-function-e-generator-iterator",
+    "title": "Generator function e Generator iterator na propriedade data de recursos no frictionless",
+    "section": "Generator function e generator iterator",
+    "text": "Generator function e generator iterator\nA propriedade data também aceita um generator iterator, mas nesse caso o método resource.read_rows vai seguir o comportamento padrão de iterators2 e na segunda chamada não irá retornar linhas:\n\ndata = (row for row in data)\n\nresource = Resource(name = 'my-resource', data = data)\nprint_json(data = resource.read_rows())\n\n[\n  {\n    \"a\": 1,\n    \"b\": 2\n  },\n  {\n    \"a\": 3,\n    \"b\": 4\n  }\n]\n\n\n\n\nprint_json(data = resource.read_rows())\n\n[]\n\n\n\nPara evitar a exaustão devemos passar como argumento para a função data um generator. As definições do glossário do Python esclarem a diferença:\n\ngenerator\nA function which returns a generator iterator. It looks like a normal function except that it contains yield expressions for producing a series of values usable in a for-loop or that can be retrieved one at a time with the next() function.\nUsually refers to a generator function, but may refer to a generator iterator in some contexts. In cases where the intended meaning isn’t clear, using the full terms avoids ambiguity.\n\n\ngenerator iterator\nAn object created by a generator function.\nEach yield temporarily suspends processing, remembering the location execution state (including local variables and pending try-statements). When the generator iterator resumes, it picks up where it left off (in contrast to functions which start fresh on every invocation).\n\nOu seja, o seguinte exemplo funciona:\n\ndef data():\n    yield ['a', 'b']\n    yield [1, 2]\n    yield [3, 4]\n\n\nresource = Resource(name = 'my-resource', data = data)\nprint_json(data = resource.read_rows())\n\n[\n  {\n    \"a\": 1,\n    \"b\": 2\n  },\n  {\n    \"a\": 3,\n    \"b\": 4\n  }\n]\n\n\n\n\nprint_json(data = resource.read_rows())\n\n[\n  {\n    \"a\": 1,\n    \"b\": 2\n  },\n  {\n    \"a\": 3,\n    \"b\": 4\n  }\n]\n\n\n\nMas se passarmos o generator iterator data() teremos problemas:\n\ndef data():\n    yield ['a', 'b']\n    yield [1, 2]\n    yield [3, 4]\n\n\nresource = Resource(name = 'my-resource', data = data())\nprint_json(data = resource.read_rows())\n\n[\n  {\n    \"a\": 1,\n    \"b\": 2\n  },\n  {\n    \"a\": 3,\n    \"b\": 4\n  }\n]\n\n\n\n\nprint_json(data = resource.read_rows())\n\n[]"
+  },
+  {
+    "objectID": "20230717T140058/index.html#custom-steps",
+    "href": "20230717T140058/index.html#custom-steps",
+    "title": "Generator function e Generator iterator na propriedade data de recursos no frictionless",
+    "section": "Custom steps",
+    "text": "Custom steps\nEsse mesmo comportamento também ocorre durante a criação de custom steps para serem utilizados com o frictionless transform:"
+  },
+  {
+    "objectID": "20230717T140058/index.html#footnotes",
+    "href": "20230717T140058/index.html#footnotes",
+    "title": "Generator function e Generator iterator na propriedade data de recursos no frictionless",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nDe acordo com a especificação:\n\nA resource MUST contain a property describing the location of the\ndata associated to the resource. The location of resource data MUST be\nspecified by the presence of one (and only one) of these two properties:\n\npath: for data in files located online or locally on disk.\ndata: for data inline in the descriptor itself.\n\n\nCabe ressaltar que além de uma lista de listas também é possível utilizar uma lista de dicionários no argumento data:\n\nJSON Tabular Data MUST be an array where each item in the array MUST be:\n\nEITHER: an array where each entry in the array is the value for that cell in the table\nOR: an object where each key corresponds to the header for that row and the value corresponds to the cell value for that row for that header\n\nRow Arrays\n[\n  [ \"A\", \"B\", \"C\" ],\n  [ 1, 2, 3 ],\n  [ 4, 5, 6 ]\n]\nRow Objects\n[\n  { \"A\": 1, \"B\": 2, \"C\": 3 },\n  { \"A\": 4, \"B\": 5, \"C\": 6 }\n]\n\n↩︎\nIteradores são consumidos quando você solicita itens deles. Iteradores que foram totalmente consumidos são às vezes chamados de esgotados.↩︎"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Base de conhecimento - Assessoria de Dados SPLOR",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nDate\n\n\nTitle\n\n\nAuthor\n\n\nDescription\n\n\nCategories\n\n\n\n\n\n\nJul 17, 2023\n\n\nGenerator function e Generator iterator na propriedade data de recursos no frictionless\n\n\nFrancisco \n\n\n\n\n\nundefined\n\n\n\n\n\n\nNo matching items"
+  }
+]
