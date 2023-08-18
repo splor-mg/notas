@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.361">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -154,408 +154,467 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introdução" class="level1">
 <h1>Introdução</h1>
-<p>As bases que compõem o relatório operacional, painel de dados de uso na SPLOR que utiliza a ferramenta de BI qlikview, são provenientes do <a href="http://www.armazem.mg.gov.br/">armazém B.O</a>, universos SIAFI e SIAD, e também das bases de Restimativa de Despesa e Receita, que atualmente se encontram compartilhadas no OneDrive e são periodicamente atualizadas pelas equipes da DCMEFO e DCAF.</p>
-<p>Essas bases têm como característica apresentar diferentes granularidades (dimensões) nos dados entre elas, em razão das especificidades inerentes a natureza dos fluxos a que pertencem. E como será mostrado ao longo desta nota, isso acarreta em um desafio adicional ao usuário desenvolvedor do qlikview na tarefa de relacioná-las e gerar visualizações.</p>
-<p>O objetivo desta nota é apresentar as diferentens granularidades de cada uma das bases, bem como comparar o método de empilhamento das bases (mais intuitivo a usuários iniciantes), com o método <a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pdf">linktable</a>, solução encontrada para relacionar as bases do retório operacional.</p>
+<p>Tabelas fato são a base para qualquer ambiente de análise de dados. Armazenando medidas quantitativas de acontecimentos mensuráveis do negócio, no menor nível de detalhe possível, permitem análises ricas em detalhes, porque seus dados podem ser facilmente agrupados em um ou mais atributos de dimensão, permitindo uma vasta combinação de insigths e questionamentos.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>Cada tabela fato é focada em um processo específico do negócio da organização. Trazendo à realidade da SPLOR, temos diversos processos orçamentários acontecendo no SIAFI e SIAD, alimentando diariamente o armazém de informações, como por exemplo, execução de despesas (empenho, liquidação e pagamento), crédito (crédito inicial da LOA mais créditos adicionais), aprovação de cotas orçamentárias, entre outros.</p>
+<p>Cada tabela fato gerada a partir de dados desses processos contém métricas e agregações próprias, mas também compartilham algumas umas com as outras, como por exemplo, unidade orçamentária, ação, grupo, fonte, elemento, item, credor, número de empenho, e etc. Com isso, é possível navegar entre as diversas tabelas e trazer para um relatório as suas métricas agregadas por dimensões em comum, o que se chama <em><code>Drill Across</code></em>, um dos pilares de estudo em Data Warehouse. <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>As ferramentas de BI, como o powerbi ou qlikview, são grandes facilitadores nesta tarefa, retirando a necessidade de inúmeras manipulações de planilhas para se criar ou atualizar um único relatório. Uma vez que, concluído o trabalho de modelagem dimensional e relacionamento entre tabelas na ferramenta, inúmeros relatórios podem ser facilmente gerados, com diferentes visões do negócio, com dados agregados em diferentes níveis, de rápida atualização e fácil distribuição aos usuários finais da informação.</p>
+<p>Contudo, construir uma modelagem dimensional e relacionar diversas tabelas fato contendo dados agrupados em diferentes dimensões, ou granularidades, não é uma tarefa nada trivial, correspondendo a uma das tarefas mais importantes, senão a mais importante dentro as atividades para construção de um painel de relatórios em BI. Isto porque não há uma regra ou fórmula única a se seguir.</p>
+<p>Cada projeto exige análise e estudo individualizados. É preciso ter em mente quais perguntas que se buscam responder, entender os processos de negócio, como os dados são gerados, as potencialidades e limitações resultantes dos possíveis cruzamentos entre duas ou mais tabelas fato distintas, para por fim poder dar início a este trabalho. Uma modelagem e relacionamentos entre tabelas incorretos levam necessariamente a resultados igualmente incorretos aos relatórios.</p>
+<p>O objetivo desta nota é lançar luz nesse sentido, apresentando a solução utilizada no painel relatório operacional qlikview na complexa tarefa de se criar uma modelagem e relacionar diferentes tabelas fato. O painel contém relatórios a partir de dados históricos e atualizados dos principais fluxos orçamentários do estado existentes no armazém de informações, universos SIAFI e SIAD, e da restimativa de receitas e despesas, em diferentes níveis de agregação.</p>
+<p>Nas próximas sessões desta nota são apresentados dois métodos de relacionamento entre tabelas, o de <a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pfd">empilhamento ou concatenate</a> das bases, que já era utilizao em outro projeto da SPLOR, o painel da reestimativa da DCAF, comparando seus resultados ao utilizado no relatório operacional, o método <em><a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pdf">linktable</a></em>, a fim de justificar escolha por este último neste projeto.</p>
 </section>
 <section id="as-diferentes-granularidades-das-bases-que-alimentam-o-relatório-operacional-qlikview" class="level1">
 <h1>As diferentes granularidades das bases que alimentam o relatório operacional qlikview:</h1>
-<p>O qlikview é uma ferramenta de selfservice BI, que permite que usuários com conhecimento de comandos básicos da ferramenta sejam capazes de criar suas próprias visualizações. A forma mais intuitiva, e geralmente mais a utilizada por esses usuários, é empilhar todas as bases que se deseja utilizar, por meio do comando <code>Concatenate</code> no <code>Script</code> do aplicativo. Este método é satisfatório quando inexiste diferença de granularidade nas bases. Entretanto, no caso das bases do relatório operacional, que apresentam diferentes granularidades entre suas bases, o empilhamento em uma única base traz problemas ao usuário da ferramenta, ilustrados no tópico a seguir.</p>
-<p>As diferentes granularidades (dimensões) dos dados pode ser verificada por meio do ementário completo das bases do projeto disponível em <a href="https://gist.github.com/hslinhares/68a3d06eae13b8facb1df42e1095c49e">data package relatorio operacional</a>.</p>
-<p>Para exemplificar os métodos de empilhamento (concatenate) e linktable nesta nota, são utilizados como amostra, as bases de Execução da Despesa, Crédito Inicial e Autorizado, e Aprovação de Cota Orçamentária, todas do exercício 2022 e provenientes do armazém B.O.</p>
+<p>As diferentes granularidades (dimensões) dos dados do ementário completo de bases utilizadas no projeto do relatório operacional qlikview pode ser verificado no <a href="https://gist.github.com/hslinhares/68a3d06eae13b8facb1df42e1095c49e">data package relatorio operacional</a>.</p>
+<p>Nesta nota, para exemplificação dos métodos de relacionamento entre tabelas, são utilizadas pequenos exemplos fictícios de bases que remontam aos fluxos orçamentários reais de execução de despesas, crédito, restos a pagar e receita. As tabelas a seguir apresentam os dados utilizados.</p>
+<p><strong>Tabela execução de despesas:</strong></p>
+<pre><code>UO_COD GRUPO FONTE ELEMENTO_ITEM EMPENHADO
+1:   1001     3    10          3999       100
+2:   1001     4    60          5101       120</code></pre>
+<p><strong>Tabela crédito:</strong></p>
+<pre><code>UO_COD GRUPO FONTE CREDITO
+1:   1001     3    10    1000
+2:   1001     4    60    1000
+3:   1002     3    60    1000
+4:   1003     3    60    1000</code></pre>
+<p><strong>Tabela restos a pagar:</strong></p>
+<pre><code>   UO_COD GRUPO FONTE ELEMENTO_ITEM RP_PAGO_PROCESSADO
+1:   1001     3    10          3333                100
+2:   1003     3    60          3999                100</code></pre>
+<p><strong>Tabela receita:</strong></p>
+<pre><code>  UO_COD FONTE ARRECADADO
+1:   1001    10        300
+2:   1001    60        300
+3:   1002    60        300
+4:   1003    60        300</code></pre>
+<p>Verificam-se que existem diferentes agregações dos dados entre as tabelas. As bases execução de despesas e restos a pagar contêm a mesma granularidade nos dados entre si (<code>UO_COD</code>, <code>GRUPO</code>, <code>FONTE</code> e <code>ELEMENTO_ITEM</code>), diferente da base crédito que não contém a dimensão <code>ELEMENTO_ITEM</code> e a base receita que somente contém as dimensões <code>UO_COD</code> e <code>FONTE</code>.</p>
 </section>
-<section id="empilhamento-das-bases-método-concatenate-no-qlikview" class="level1">
-<h1>Empilhamento das bases (método concatenate) no qlikview:</h1>
-<p>Acessando o <code>Script</code> do qlikview, por meio do <code>ctrl E</code>, os seguintes passos devem ser seguidos:</p>
-<section id="passo-1-empilhar-as-bases-mensais-da-execução-da-despesa-2022" class="level2">
-<h2 class="anchored" data-anchor-id="passo-1-empilhar-as-bases-mensais-da-execução-da-despesa-2022">Passo 1: Empilhar as bases mensais da Execução da Despesa 2022:</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>//cria uma tabela temporária com a execução de todos os meses de 2022.</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>execucao_temp:</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>LOAD ANO, </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>     MES, </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>     UE_COD, </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>     UO_FINAN, </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>     UPG_COD, </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>     EMPENHO_NUM, </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>     FUNCAO_COD, </span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>     ACAO_COD, </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>     MODALIDADE_COD, </span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>     IAG_COD, </span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>     IPU_COD, </span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>     PROCESSO_NUMERO, </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>     CONTRATO_ENTRADA, </span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>     OBRA_NUMERO, </span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>     CONTRATO_NUMERO, </span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD, </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ORIGEM_DEA_COD, </span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>     ITEM_ORIGEM_DEA_COD, </span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>     CREDOR_CNPJ_CPF, </span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>     DESPESA_EMP, </span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>     DESPESA_LIQ, </span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>     DESPESA_PAGA_ORC, </span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>     DESPESA_PAGA_FIN</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>FROM</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>[data-raw\execucao_2022*]</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="método-de-empilhamento-de-tabelas-função-concatenate-no-qlikview" class="level1">
+<h1>Método de empilhamento de tabelas (função Concatenate) no qlikview:</h1>
+<p>Vale salientar que, o qlikview automaticamente empilha bases com colunas exatamente iguais em nome e quantidade. Quando isto não ocorre, como no exemplo, é necessário forçar o empilhamento por meio da função <code>Concatenate</code>, no <code>Script</code> da ferramenta, conforme se segue:</p>
+<section id="passo-1-leitura-e-empilhamento-das-bases-execução-de-despesas-crédito-restos-a-pagar-e-receita" class="level2">
+<h2 class="anchored" data-anchor-id="passo-1-leitura-e-empilhamento-das-bases-execução-de-despesas-crédito-restos-a-pagar-e-receita">Passo 1: Leitura e empilhamento das bases Execução de Despesas, Crédito, Restos a Pagar e Receita:</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>execucao_despesas:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD, </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>     DESPESA_EMP</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>[data\execucao.xlsx]</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>credito:</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>     CREDITO</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>[data-raw\credito.xlsx]</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>restos_a_pagar:</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD,</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>     PAGO_PROCESSADO</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>[data-raw\restos_a_pagar.xlsx]</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>Concatenate:</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>receita:</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>LOAD UO_COD, </span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>     FONTE, </span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>     ARRECADADO</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>[data\receita.xlsx]</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="passo-2-empilhar-as-bases-crédito-inicial-e-autorizado-e-aprovação-de-cota-orçamentária-2022-na-tabela-de-execução-criada-no-passo-anterior" class="level2">
-<h2 class="anchored" data-anchor-id="passo-2-empilhar-as-bases-crédito-inicial-e-autorizado-e-aprovação-de-cota-orçamentária-2022-na-tabela-de-execução-criada-no-passo-anterior">Passo 2: Empilhar as bases Crédito Inicial e Autorizado, e Aprovação de Cota Orçamentária 2022 na tabela de Execução criada no passo anterior:</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>//Cria uma tabela com os dados de execução, crédito inicial e autorizado, cota orçamentária e exclui a tabela temporária de execução utilizada para empillhar as bases mensais.</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>NoConcatenate</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>execucao:</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>LOAD ANO, </span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>     MES, </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>     UE_COD, </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>     UO_FINAN, </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>     UPG_COD, </span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>     EMPENHO_NUM, </span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>     FUNCAO_COD, </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>     ACAO_COD, </span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>     MODALIDADE_COD, </span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>     IAG_COD, </span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>     IPU_COD, </span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>     PROCESSO_NUMERO, </span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>     CONTRATO_ENTRADA, </span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>     OBRA_NUMERO, </span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>     CONTRATO_NUMERO, </span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD, </span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ORIGEM_DEA_COD, </span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>     ITEM_ORIGEM_DEA_COD, </span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>     CREDOR_CNPJ_CPF, </span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>     DESPESA_EMP, </span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>     DESPESA_LIQ, </span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>     DESPESA_PAGA_ORC, </span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>     DESPESA_PAGA_FIN</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>Resident execucao_temp;</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>credito:</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>LOAD ANO, </span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>     ACAO_COD, </span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>     IAG_COD, </span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>     IPU_COD, </span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>     CREDITO_INICIAL, </span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>     CREDITO_AUTORIZADO</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>FROM</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>[data-raw\credito-inicial-autorizado_2022.xlsx]</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>cota:</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>LOAD ANO, </span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>     IAG_COD, </span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>     IPU_COD, </span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>     ACAO_COD, </span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD, </span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>     [COTA APROVADA LIQUIDA]</span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>FROM</span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>[data-raw\cota-item-data_2022.xlsx]</span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>drop table execucao_temp; </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="resultado" class="level2">
-<h2 class="anchored" data-anchor-id="resultado">Resultado</h2>
-<p>Após seguir os passos anteriores e dar o comando <code>ctrl R</code> no script do qlikview para leitura das bases, o resultado será uma única tabela de dados empilhada, que pode ser verificada por meio do comando <code>ctrl T</code>, vide figura a seguir:</p>
+<section id="resultado-do-método-de-empilhamento" class="level2">
+<h2 class="anchored" data-anchor-id="resultado-do-método-de-empilhamento">Resultado do método de empilhamento</h2>
+<p>Após a leitura dos dados, e o resultado será uma única tabela de dados empilhada, que pode ser verificada por meio do comando <code>ctrl T</code>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/base_empilhada.png" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">base empilhada</figcaption>
 </figure>
 </div>
+<p>Clicando com o botão direito sobre esta tabela acima é possível se verificar o conteúdo da tabela empilhada:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/dados_base_empilhada.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">dados base empilhada</figcaption>
+</figure>
+</div>
+<p>Observa-se que a tabela empilhada contém todas as colunas de suas tabelas de origem. E nas linhas correspondentes a dados de uma determinada tabela, onde inexista alguma coluna da tabela empilhada, o seu valor retorna nulo. Por exemplo, a última linha corresponde a dados da tabela receita, em que há dados somente para <code>UO</code> e <code>FONTE</code>, restando nulo todas as demais colunas.</p>
+<p>Com o dados corretamente empilhados podem ser construídos relatórios na ferramenta.</p>
 </section>
-<section id="criação-de-dashboards-no-método-de-empilhamento-das-bases-concatenate" class="level2">
-<h2 class="anchored" data-anchor-id="criação-de-dashboards-no-método-de-empilhamento-das-bases-concatenate">Criação de <em>dashboards</em> no método de empilhamento das bases (Concatenate):</h2>
-<p>Com as bases lidas, dentro da aba de criação de <em>dashboards</em> no qlikview, o próximo passo é inserir <code>Novo Objeto de Pasta</code> do tipo <code>Lista</code> para objetos de filtro e <code>Gráfico</code>/<code>Tabela Simples</code> para criação da Tabela com os dados desejados.</p>
-<p>No exemplo foi criada a Tabela 1 em que são visualizados dados de 2022 de Crédito Orçamentário, Cota Aprovada, Despesa Empenhada e Despesa Liquidada, por Unidade Orçamentária, Grupo de Despesa, Fonte de Recursos e Procedência. E como filtro, as dimensões Unidade Orçamentária (UO_COD), Ação (ACAO_COD), Grupo de Despesa (GRUPO_COD), Elemento Item de Despesa (ELEMENTO_ITEM_COD) e Número do Contrato (CONTRATO_NUMERO).</p>
+<section id="criação-de-dashboards-para-visualização-dos-dados-método-de-empilhamento-das-bases-concatenate" class="level2">
+<h2 class="anchored" data-anchor-id="criação-de-dashboards-para-visualização-dos-dados-método-de-empilhamento-das-bases-concatenate">Criação de <em>dashboards</em> para visualização dos dados método de empilhamento das bases (Concatenate):</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/concatenate_painel.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
+<figcaption class="figure-caption">concatenate_painel</figcaption>
 </figure>
 </div>
-</section>
-<section id="utilização-dos-filtros-e-resultados-no-método-de-empilhamento-concatenate" class="level2">
-<h2 class="anchored" data-anchor-id="utilização-dos-filtros-e-resultados-no-método-de-empilhamento-concatenate">Utilização dos filtros e resultados no método de empilhamento (concatenate)</h2>
-<p>Nos campos de filtro é possível se fazer a seleção desejada nos dados. Quando se filtra por dimensões existentes em todas as bases, como no exemplo, UO_COD, ACAO_COD ou GRUPO_COD, a tabela retorna valores desejados.</p>
+<p>Com as bases lidas, dentro no ambiente de aba de criação de <em>dashboards</em> no qlikview, o próximo passo é inserir <code>Novo Objeto de Pasta</code> do tipo <code>Lista</code> para objetos de filtro e <code>Gráfico</code>/<code>Tabela Simples</code> para criação da Tabela com os dados desejados.</p>
+<p>No nosso exemplo, construímos uma tabela contendo <code>UO_COD</code> e <code>FONTE</code> como dimensões, e as métricas de todos os processos orçamentários.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/concatenate_filtro-1.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
+<figcaption class="figure-caption">concatenate_filtro-1</figcaption>
 </figure>
 </div>
-<p>Contudo, quando se filtra por alguma dimensão não existente em alguma das bases da Tabela 1, seus dados retornam zerados. Neste exemplo, ao se filtrar por Elemento Item, os dados de Crédito Inicial e Autorizado retornam zero, por suas bases não conterem esta dimensão.</p>
+<p>Filtrando-se por dimensões existentes em todas as bases, por exemplo, <code>FONTE</code>, a tabela retorna as medidas existentes agrupadas nesta dimensão no valor selecionado.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/concatenate_filtro-2.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
+<figcaption class="figure-caption">concatenate_filtro-2</figcaption>
 </figure>
 </div>
-<p>A visualização mais informativa neste caso seria o retorno do Crédito Inicial e Autorizado na estrutura orçamentária em que houve a execução de despesas no Elemento Item selecionado; neste exemplo, UO_COD = 1501, ACAO_COD = 2500 e GRUPO_COD = 3.</p>
-<p>O mesmo problema ocorre ao filtramos por algum contrato. Neste caso, além do Crédito Inicial e Autorizado, a Cota Aprovada também retorna zero, pois inexiste essa dimensão nas bases a que pertencem. Do mesmo modo, a visualização desejada seria o retorno dos dados de Crédito Inicial e Autorizado e Cota Aprovada, na estrutura orçamentária em que houve a execução da despesa no contrato selecionado.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figuras/concatenate_filtro-3.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
-</figure>
-</div>
+<p>Entretanto, quando se filtra por alguma dimensão inexistente em alguma das bases, suas métricas retornam nulo. Como exemplo, ao se filtrar por <code>ELEMENTO_ITEM</code> <code>3999</code>, os dados <code>CREDITO</code> e <code>ARRECADADO</code>retornam zero (Como <em>default</em> o qlikview converte dados nulos em zero nos relatórios).</p>
+<p>Com base na tabela resultante do empilhamento das bases, o resultado do filtro está de acordo com o esperado, uma vez que, de fato, inexiste a dimensão<code>ELEMENTO_ITEM</code> nas tabelas crédito e receita.</p>
+<p>Contudo, o resultado desejado para uso na SPLOR é que ao se filtrar por <code>ELEMENTO_ITEM</code> <code>3999</code>, o painel também retorne valores de <code>CREDITO</code> e <code>RECEITA</code> no nível agregação compartilhada entre as bases. Ou seja, como neste <code>ELEMENTO_ITEM</code> ocorreu execução de despesas (empenho e pagamento de RP) na <code>UO_COD</code> <code>1001</code>e <code>1003</code>, <code>GRUPO</code> <code>3</code>,<code>FONTE</code> <code>10</code> e <code>60</code>, o painel deve retornar o total <code>ARRECADADO</code> nessas UOs e fontes, e da base crédito o valor do <code>CREDITO</code> dessas UOs, fontes e grupo de despesa.</p>
+<p>No painel relatorio operacional qlikview esta solução foi atingida a partir de uma adaptação ao método <a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pdf">linktable</a> de relacionamento de bases demonstrada a seguir.</p>
 </section>
 </section>
-<section id="relacionamento-de-bases-por-linktable-no-qlikview" class="level1">
-<h1>Relacionamento de bases por <em>Linktable</em> no qlikview:</h1>
-<p>O método de relacionamento <a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pdf">linktable</a> consiste em se juntar em uma única tabela as dimensões de todas as bases (No exemplo: UO, AÇÃO, GRUPO, FONTE, IPU, e etc.), criando-se a tabela dimensão, e por meio de chaves fazer o relacionamento com as tabelas fato, ou seja, os dados do négócio (Crédito Inicial e Autorizado, Cota Aprovada, Despesa Empenhada e Liquidada, e etc.)</p>
+<section id="método-linktable-ou-tabela-link" class="level1">
+<h1>Método <em>linktable</em> ou tabela Link:</h1>
+<p>O método de relacionamento <em><a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pdf">linktable</a></em> consiste empilhar em uma única tabela, chamada <code>tabela link</code> ou <em><code>linktable</code></em>,todas as variáveis em comum de todas as tabelas fato. No exemplo, <code>UO</code>, <code>GRUPO</code>, <code>FONTE</code>, e <code>ELEMENTO_ITEM</code>, e criar nesta tabela a coluna chave, resultado da concatenação dos valores das outras demais colunas.</p>
+<p>Esta coluna chave também deve ser criada em cada uma das tabela fato, onde devem restar somente esta coluna e suas respectivas métricas (<code>CREDITO</code>, <code>EMPENHADO</code>, <code>PAGO_PROCESSADO</code> e <code>ARRECADADO</code>), e por meio da qual será feita a ligação com a <code>tabela link</code>.</p>
 </section>
-<section id="método-linktable-no-qlikview" class="level1">
-<h1>Método linktable no qlikview</h1>
-<p>Vamos utilizar as mesmas bases utilizadas no exemplo anterior do método de empilhamento das bases para comparação dos resultados.</p>
-<p>Acessando o <code>Script</code> do qlikview, por meio do <code>ctrl E</code>, os seguintes passos devem ser seguidos:</p>
-<section id="passo-1-empilhar-as-bases-mensais-da-execução-da-despesa-2022-1" class="level2">
-<h2 class="anchored" data-anchor-id="passo-1-empilhar-as-bases-mensais-da-execução-da-despesa-2022-1">Passo 1: Empilhar as bases mensais da Execução da Despesa 2022:</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>//cria uma tabela temporária com a execução de todos os meses de 2022.</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>execucao_temp:</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>LOAD ANO, </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>     MES, </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>     UE_COD, </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>     UO_FINAN, </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>     UPG_COD, </span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>     EMPENHO_NUM, </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>     FUNCAO_COD, </span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>     ACAO_COD, </span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>     MODALIDADE_COD, </span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>     IAG_COD, </span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>     IPU_COD, </span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>     PROCESSO_NUMERO, </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>     CONTRATO_ENTRADA, </span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>     OBRA_NUMERO, </span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>     CONTRATO_NUMERO, </span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD, </span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ORIGEM_DEA_COD, </span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>     ITEM_ORIGEM_DEA_COD, </span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>     CREDOR_CNPJ_CPF, </span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>     DESPESA_EMP, </span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>     DESPESA_LIQ, </span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>     DESPESA_PAGA_ORC, </span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>     DESPESA_PAGA_FIN</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>FROM</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>[data-raw\execucao_2022*]</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<pre><code>//Cria a chave1 na tabela fato e torna as variavéis dimensão como comentário no Script
+<section id="método-linktable-com-uma-chave" class="level1">
+<h1>Método <em>linktable</em> com uma chave:</h1>
+<section id="passo-1-criar-nas-tabelas-fato-uma-coluna-chave-correspondente-ao-seu-conjunto-de-dimensões-deixando-para-leitura-somente-esta-chave-e-a-métrica." class="level2">
+<h2 class="anchored" data-anchor-id="passo-1-criar-nas-tabelas-fato-uma-coluna-chave-correspondente-ao-seu-conjunto-de-dimensões-deixando-para-leitura-somente-esta-chave-e-a-métrica.">Passo 1: criar nas tabelas fato uma coluna chave correspondente ao seu conjunto de dimensões, deixando para leitura somente esta chave e a métrica.</h2>
+<pre><code>//Cria a chave na tabela fato de Despesa Empenhada e torna as variavéis dimensão como comentário no Script
 
-NoConcatenate
-
-execucao:
+execucao_despesas:
 LOAD 
-ANO&amp;'|'&amp;MES&amp;'|'&amp;UO_COD&amp;'|'&amp;UE_COD&amp;'|'&amp;UO_FINAN &amp;'|'&amp;UPG_COD&amp;'|'&amp;EMPENHO_NUM&amp;'|'&amp;FUNCAO_COD&amp;'|'&amp;ACAO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;MODALIDADE_COD&amp;'|'&amp;IAG_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;IPU_COD&amp;'|'&amp;PROCESSO_NUMERO&amp;'|'&amp;CONTRATO_ENTRADA&amp;'|'&amp;OBRA_NUMERO&amp;'|'&amp;CONTRATO_NUMERO&amp;'|'&amp;ELEMENTO_ITEM_COD&amp;'|'&amp;ELEMENTO_ORIGEM_DEA_COD&amp;'|'&amp;ITEM_ORIGEM_DEA_COD&amp;'|'&amp;CREDOR_CNPJ_CPF as chave1,
-     //ANO, 
-     //MES, 
+UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave,
+LOAD 
      //UO_COD, 
-     //UE_COD, 
-     // UO_FINAN, 
-     // UPG_COD, 
-     // EMPENHO_NUM, 
-     // FUNCAO_COD, 
-     //ACAO_COD, 
-     // GRUPO_COD, 
-     //MODALIDADE_COD, 
-     // IAG_COD, 
-     // FONTE_COD, 
-     //IPU_COD, 
-     //PROCESSO_NUMERO, 
-     //CONTRATO_ENTRADA, 
-     //OBRA_NUMERO, 
-     // CONTRATO_NUMERO, 
-     // ELEMENTO_ITEM_COD, 
-     // ELEMENTO_ORIGEM_DEA_COD, 
-     //ITEM_ORIGEM_DEA_COD, 
-     // CREDOR_CNPJ_CPF, 
-     DESPESA_EMP, 
-     DESPESA_LIQ, 
-     DESPESA_PAGA_ORC, 
-     DESPESA_PAGA_FIN
-Resident execucao_temp;
-</code></pre>
-<pre><code>//Cria a chave2 na tabela fato e torna as variavéis dimensão como comentário no Script
-
-credito:
-LOAD
-ANO&amp;'|'&amp;UO_COD&amp;'|'&amp;ACAO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;IAG_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;IPU_COD as chave2,
-//ANO, 
-//UO_COD, 
-//ACAO_COD, 
-//GRUPO_COD, 
-//IAG_COD, 
-//FONTE_COD, 
-//IPU_COD, 
-//CREDITO_INICIAL, 
-//CREDITO_AUTORIZADO
+     //GRUPO_COD, 
+     //FONTE_COD, 
+     //ELEMENTO_ITEM_COD, 
+     DESPESA_EMP
 FROM
-[data-raw\credito-inicial-autorizado_2022.xlsx]
+[data\execucao.xlsx]
 (ooxml, embedded labels, table is base);</code></pre>
-<pre><code>//Cria a chave3 na tabela fato e torna as variavéis dimensão como comentário no Script
+<pre><code>//Cria a chave na tabela fato de Restos a Pagar e torna as variavéis dimensão como comentário no Script
 
-cota:
+restos_a_pagar:
+LOAD  
+UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave,
+     //UO_COD, 
+     //GRUPO_COD, 
+     //FONTE_COD, 
+     //ELEMENTO_ITEM_COD,
+     PAGO_PROCESSADO
+FROM
+[data-raw\restos_a_pagar.xlsx]
+(ooxml, embedded labels, table is base);
+</code></pre>
+<pre><code>//Cria a chave na tabela fato Crédito e torna as variavéis dimensão como comentário no Script
+credito:
+UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD as chave
+LOAD  
+    // UO_COD, 
+    // GRUPO_COD, 
+    // FONTE_COD, 
+     CREDITO
+FROM
+[data-raw\credito.xlsx]
+(ooxml, embedded labels, table is base);</code></pre>
+<pre><code>//Cria a chave na tabela fato Receita e torna as variavéis dimensão como comentário no Script
+receita3:
 LOAD 
-ANO&amp;'|'&amp;UO_COD&amp;'|'&amp;ACAO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;IAG_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;IPU_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave3,
-//[Ano de Exercício], 
-//UO_COD,
-//ACAO_COD, 
-//GRUPO_COD, 
-//IAG_COD, 
-//FONTE_COD, 
-//IPU_COD, 
-//ELEMENTO_ITEM_COD, 
-[COTA APROVADA LIQUIDA]
+UO_COD&amp;'|'&amp;FONTE as chave,
+//UO_COD, 
+     //FONTE, 
+     ARRECADADO
 FROM
-[data-raw\cota-item-data_2022.xlsx]
-(ooxml, embedded labels, table is base);
-</code></pre>
-<pre><code>//cria a tabela link contendo todas as dimensões de todas as bases e cria chaves para comunicar com as tabelas fato
-//inserindo as dimensões da base de Execução de Despesas
-NoConcatenate
-
+[data\receita.xlsx]
+(ooxml, embedded labels, table is base);</code></pre>
+</section>
+<section id="passo-2-criar-a-tabela-link-empilhando-todas-as-dimensões-e-coluna-chave-das-tabelas-fato.-e-utilizar-a-função-distinct-para-retirar-linhas-duplicadas." class="level2">
+<h2 class="anchored" data-anchor-id="passo-2-criar-a-tabela-link-empilhando-todas-as-dimensões-e-coluna-chave-das-tabelas-fato.-e-utilizar-a-função-distinct-para-retirar-linhas-duplicadas.">Passo 2: criar a tabela link empilhando todas as dimensões e coluna chave das tabelas fato. E utilizar a função <code>distinct</code> para retirar linhas duplicadas.</h2>
+<pre><code>//cria a tabela link contendo todas as dimensões de todas as bases e cria chave para comunicar com as tabelas fato
+//
 link:
-LOAD Distinct
-ANO&amp;'|'&amp;MES&amp;'|'&amp;UO_COD&amp;'|'&amp;UE_COD&amp;'|'&amp;UO_FINAN &amp;'|'&amp;UPG_COD&amp;'|'&amp;EMPENHO_NUM&amp;'|'&amp;FUNCAO_COD&amp;'|'&amp;ACAO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;MODALIDADE_COD&amp;'|'&amp;IAG_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;IPU_COD&amp;'|'&amp;PROCESSO_NUMERO&amp;'|'&amp;CONTRATO_ENTRADA&amp;'|'&amp;OBRA_NUMERO&amp;'|'&amp;CONTRATO_NUMERO&amp;'|'&amp;ELEMENTO_ITEM_COD&amp;'|'&amp;ELEMENTO_ORIGEM_DEA_COD&amp;'|'&amp;ITEM_ORIGEM_DEA_COD&amp;'|'&amp;CREDOR_CNPJ_CPF as chave1, 
-ANO&amp;'|'&amp;UO_COD&amp;'|'&amp;ACAO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;IAG_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;IPU_COD as chave2,
-ANO&amp;'|'&amp;UO_COD&amp;'|'&amp;ACAO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;IAG_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;IPU_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave3,
-ANO,
-MES,
-UO_COD,
-UE_COD,
-UO_FINAN, 
-UPG_COD,
-EMPENHO_NUM,
-FUNCAO_COD,
-ACAO_COD,
-GRUPO_COD,
-MODALIDADE_COD,
-IAG_COD,
-FONTE_COD,
-IPU_COD,
-PROCESSO_NUMERO,
-CONTRATO_ENTRADA,
-OBRA_NUMERO,
-CONTRATO_NUMERO,
-ELEMENTO_ITEM_COD,
-ELEMENTO_ORIGEM_DEA_COD,
-ITEM_ORIGEM_DEA_COD,
-CREDOR_CNPJ_CPF
-resident execucao_temp;
+LOAD 
+Distinct
+UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave,
+    UO_COD, 
+    GRUPO, 
+    FONTE, 
+    ELEMENTO_ITEM
+     //EMPENHADO
+FROM
+[data\execucao.xlsx]
+(ooxml, embedded labels, table is base);
 
 Concatenate
 
-//cria a tabela link contendo todas as dimensões de todas as bases e cria chaves para comunicar com as tabelas fato
-//inserindo as dimensões da base de Crédito Inicial e Autorizado
-link:
-LOAD Distinct
+LOAD
+Distinct
+UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave,
+    UO_COD, 
+    GRUPO, 
+    FONTE, 
+     ELEMENTO_ITEM
+     //RP_PAGO_PROCESSADO
+FROM
+[data\restos_a_pagar.xlsx]
+(ooxml, embedded labels, table is base);
+
+Concatenate
+
+LOAD 
+Distinct
+UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave, 
+    UO_COD, 
+    GRUPO, 
+    FONTE
+   /// CREDITO
+FROM
+[data\credito.xlsx]
+(ooxml, embedded labels, table is base);
+
+Concatenate
+
+LOAD 
+Distinct
 null() as chave1,
-ANO&amp;'|'&amp;UO_COD&amp;'|'&amp;ACAO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;IAG_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;IPU_COD as chave2,
-null() as chave3,
-ANO,
+null () as chave2,
+UO_COD&amp;'|'&amp;FONTE as chave3, 
 UO_COD,
-ACAO_COD,
-GRUPO_COD,
-IAG_COD,
-FONTE_COD,
-IPU_COD 
+FONTE
+//ARRECADADO
 FROM
-[data-raw\credito-inicial-autorizado_2022.xlsx]
+[data\receita.xlsx]
+(ooxml, embedded labels, table is base)</code></pre>
+</section>
+<section id="resultado-do-método-linktable-com-uma-chave" class="level2">
+<h2 class="anchored" data-anchor-id="resultado-do-método-linktable-com-uma-chave">Resultado do método <em>Linktable</em> com uma chave:</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/linktable-1.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">linktable-1</figcaption>
+</figure>
+</div>
+<p>Conforme imagem do modelo dimensional acima, diferente do método de empilhamento, o método linktable preserva as tabelas fato com suas métricas, ligadas por uma chave à tabela de ligação.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/dados_linktable.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">dados_linktable</figcaption>
+</figure>
+</div>
+<p>Observando-se os dados armazenados nas tabelas, verifica-se que em cada linha na <code>tabela link</code> existe uma chave corresponde a uma linha em um das tabelas fato. Mas poderia, se fosse o caso, ser também uma relação um para muitos.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/dados_linktable3.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">dados_linktable3</figcaption>
+</figure>
+</div>
+<p>Ao se filtrar pela dimensão <code>ELEMENTO_ITEM</code> <code>3999</code>, o resultado foi o mesmo que ao do método de <code>empilhamento</code> das tabelas. Ou seja, os valores das tabelas crédito e receita retornaram nulos. Isto porque em suas chaves não existe esta dimensão.</p>
+<p>O caminho seguido para se obter o resultado esperado dos filtros foi observando o <code>modo automático</code> do qlikiview, que cria uma espécie de <code>tabela link com várias chaves</code>, uma para cada conjunto de dimensões, conforme tópico a seguir.</p>
+</section>
+</section>
+<section id="relacionamento-entre-tabelas-automático-no-qlikview" class="level1">
+<h1>Relacionamento entre tabelas automático no qlikview</h1>
+<p>É importante saber que o qlikview busca automaticamente empilhar bases com colunas do mesmo nome, ou caso sejam diferentes, criar uma espécie de tabela de ligação e chaves sintéticas. Esta solução apesar de disponível e muito utilizada por iniciantes, não é recomendada pelo próprio fabricante<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>, por eventualmente levar a resultados corretos e referências circulares, não se ter controle da modelagem e por consumir mais recursos computacionais, principalmente na existência de grandes e diversas tabelas fato.</p>
+<p>Porém, para poucas tabelas como no exemplo, a sua utilização é didática para entender o resultado gerado.</p>
+<section id="resultado-do-relacionamento-entre-tabelas-automático" class="level2">
+<h2 class="anchored" data-anchor-id="resultado-do-relacionamento-entre-tabelas-automático">Resultado do relacionamento entre tabelas automático</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/automatico.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">automatico</figcaption>
+</figure>
+</div>
+<p>Com os dados da nota, a ferramenta foi capaz de entregar o resultado esperado. De forma automática foi criada a tabela <code>$Syn 6 Table</code>, análoga a <code>tabela link</code> ou <code>linktable</code> contendo todas as dimensões, ligadas às tabelas, onde restaram somente as métricas, por chaves específicas para cada tabela de acordo o conjunto de dimensões de cada uma delas.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/automatico_filtro.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">automatico</figcaption>
+</figure>
+</div>
+<p>O resultado do filtro do <code>ELEMENTO_ITEM</code> <code>3999</code> é de acordo com o esperado pelo usuário da SPLOR, trazendo dados de <code>CREDITO</code> e <code>ARRECADADO</code>na estrutura orçamentária correspondente existente nessas bases.</p>
+<p>O que observou-se no comportamento automático é que são criadas uma chave para cada conjunto de dimensões existentes na tabela fato. Deste modo as tabelas passam a responder ao filtro como desejado. Retornando o dado de cada uma delas no nível de agregação compartilhado com as demais.</p>
+</section>
+</section>
+<section id="construção-do-método-linktable-no-qlikview-com-multiplas-chaves" class="level1">
+<h1>Construção do método linktable no qlikview com multiplas chaves:</h1>
+<p>A estratégia adotada no relatório operacional foi recriar a estrutura do modo automático mostrado anteriormente, porém por meio de comandos ao <code>qlikview</code>, a fim de se ter controle na ferramenta do modelo de dados e se evitar todos os problemas desta função.</p>
+<section id="passo-1-criar-nas-tabelas-fato-uma-coluna-chave-específica-correspondente-a-cada-conjunto-de-dimensões-deixando-para-leitura-somente-esta-chave-e-a-métrica." class="level2">
+<h2 class="anchored" data-anchor-id="passo-1-criar-nas-tabelas-fato-uma-coluna-chave-específica-correspondente-a-cada-conjunto-de-dimensões-deixando-para-leitura-somente-esta-chave-e-a-métrica.">Passo 1: criar nas tabelas fato uma coluna chave específica correspondente a cada conjunto de dimensões, deixando para leitura somente esta chave e a métrica.</h2>
+<pre><code>//Cria a chave na tabela fato de Despesa Empenhada e torna as variavéis dimensão como comentário no Script
+
+execucao_despesas:
+LOAD 
+UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave1,
+LOAD 
+     //UO_COD, 
+     //GRUPO_COD, 
+     //FONTE_COD, 
+     //ELEMENTO_ITEM_COD, 
+     DESPESA_EMP
+FROM
+[data\execucao.xlsx]
+(ooxml, embedded labels, table is base);</code></pre>
+<pre><code>//Cria a chave na tabela fato de Restos a Pagar e torna as variavéis dimensão como comentário no Script
+
+restos_a_pagar:
+LOAD  
+UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave1,
+     //UO_COD, 
+     //GRUPO_COD, 
+     //FONTE_COD, 
+     //ELEMENTO_ITEM_COD,
+     PAGO_PROCESSADO
+FROM
+[data-raw\restos_a_pagar.xlsx]
+(ooxml, embedded labels, table is base);
+</code></pre>
+<pre><code>//Cria a chave na tabela fato Crédito e torna as variavéis dimensão como comentário no Script
+credito:
+UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD as chave2
+LOAD  
+    // UO_COD, 
+    // GRUPO_COD, 
+    // FONTE_COD, 
+     CREDITO
+FROM
+[data-raw\credito.xlsx]
+(ooxml, embedded labels, table is base);</code></pre>
+<pre><code>//Cria a chave na tabela fato Receita e torna as variavéis dimensão como comentário no Script
+receita3:
+LOAD 
+UO_COD&amp;'|'&amp;FONTE as chave,
+//UO_COD, 
+     //FONTE, 
+     ARRECADADO
+FROM
+[data\receita.xlsx]
+(ooxml, embedded labels, table is base);</code></pre>
+</section>
+<section id="passo-2-criar-tabela-link-empilhando-todas-as-chaves-e-dimensões-das-tabelas-fato.-utilizar-a-função-distinct-para-retirar-linhas-duplicadas." class="level2">
+<h2 class="anchored" data-anchor-id="passo-2-criar-tabela-link-empilhando-todas-as-chaves-e-dimensões-das-tabelas-fato.-utilizar-a-função-distinct-para-retirar-linhas-duplicadas.">Passo 2: criar tabela link empilhando todas as chaves e dimensões das tabelas fato. Utilizar a função <code>distinct</code> para retirar linhas duplicadas.</h2>
+<pre><code>//cria a tabela link contendo todas as dimensões de todas as bases e cria chave para comunicar com as tabelas fato
+//
+link:
+LOAD 
+Distinct
+UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave1,
+UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave2, 
+UO_COD&amp;'|'&amp;FONTE as chave3,
+    UO_COD, 
+    GRUPO, 
+    FONTE, 
+    ELEMENTO_ITEM
+     //EMPENHADO
+FROM
+[data\execucao.xlsx]
 (ooxml, embedded labels, table is base);
 
 Concatenate
 
-//cria a tabela link contendo todas as dimensões de todas as bases e cria chaves para comunicar com as tabelas fato
-//inserindo as dimensões da base de Cota Aprovada
-link:
-LOAD Distinct
-null () as chave1,
-ANO&amp;'|'&amp;UO_COD&amp;'|'&amp;ACAO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;IAG_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;IPU_COD as chave2,
-ANO&amp;'|'&amp;UO_COD&amp;'|'&amp;ACAO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;IAG_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;IPU_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave3,
-ANO,
-UO_COD,
-ACAO_COD,
-GRUPO_COD,
-IAG_COD,
-FONTE_COD,
-IPU_COD,
-ELEMENTO_ITEM_COD
+LOAD
+Distinct
+UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave1,
+UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave2, 
+UO_COD&amp;'|'&amp;FONTE as chave3,
+    UO_COD, 
+    GRUPO, 
+    FONTE, 
+     ELEMENTO_ITEM
+     //RP_PAGO_PROCESSADO
 FROM
-[data-raw\cota-item-data_2022.xlsx]
+[data\restos_a_pagar.xlsx]
 (ooxml, embedded labels, table is base);
 
-</code></pre>
+Concatenate
+
+LOAD 
+Distinct
+null() as chave1,
+UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave2, 
+UO_COD&amp;'|'&amp;FONTE as chave3, 
+    UO_COD, 
+    GRUPO, 
+    FONTE
+   /// CREDITO
+FROM
+[data\credito.xlsx]
+(ooxml, embedded labels, table is base);
+
+Concatenate
+
+LOAD 
+Distinct
+null() as chave1,
+null () as chave2,
+UO_COD&amp;'|'&amp;FONTE as chave3, 
+UO_COD,
+FONTE
+//ARRECADADO
+FROM
+[data\receita.xlsx]
+(ooxml, embedded labels, table is base)</code></pre>
 </section>
-<section id="resultado-1" class="level2">
-<h2 class="anchored" data-anchor-id="resultado-1">Resultado</h2>
-<p>Após seguir os passos anteriores e dar o comando <code>ctrl R</code> no script do qlikview, o resultado serão uma única tabela dimensão ligada as tabelas fato por meio de chaves, verificada por meio do comando <code>ctrl T</code>, conforme figura a seguir:</p>
+<section id="resultado-do-método-linktable-com-múltiplas-chaves" class="level2">
+<h2 class="anchored" data-anchor-id="resultado-do-método-linktable-com-múltiplas-chaves">Resultado do método Linktable com múltiplas chaves:</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="figuras/linktable.png" class="img-fluid figure-img"></p>
+<p><img src="figuras/linktable-2.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">linktable-2</figcaption>
+</figure>
+</div>
+<p>O resultado foi a tabela tabela de ligação ligadas a cada uma das tabelas por meio de chaves específicas para cada uma delas.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/dados_linktable2.png" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">base empilhada</figcaption>
 </figure>
 </div>
-</section>
-<section id="criação-de-dashboards-no-método-linktable" class="level2">
-<h2 class="anchored" data-anchor-id="criação-de-dashboards-no-método-linktable">Criação de <em>dashboards</em> no método <em>Linktable</em>:</h2>
-<p>De maneira análoga ao exemplo anterior de empilhamento de bases, foram utilizados os mesmos campos para criação da Tabela 2 e os filtros. Os dados totais sem filtro são exatamente iguais aos da Tabela 1.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figuras/linktable_painel.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
-</figure>
-</div>
-</section>
-<section id="utilização-dos-filtros-e-resultados-no-método-linktable" class="level2">
-<h2 class="anchored" data-anchor-id="utilização-dos-filtros-e-resultados-no-método-linktable">Utilização dos filtros e resultados no método <em>linktable</em></h2>
-<p>Ao se filtrar por alguma dimensão comum entre todas as bases das variáveis que compõem a Tabela 2, o resultado é o mesmo da Tabela 1, retornando dados corretamente.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figuras/linktable_filtro-1.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
-</figure>
-</div>
-<p>A diferença entre o método de empilhamento e o linktable ocorre ao se filtrar por alguma dimensão que inexiste em alguma das bases das variáveis que compõem a Tabela 2. Neste Caso, diferente do exemplo da Tabela 1, ao se filtrar por exemplo por Elemento Item, os dados de Crédito Inicial e Autorizado retornarão dados da estrutura orçamentária em que a houve Execução de Despesa, e/ou Aprovação de Cota.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figuras/linktable_filtro-2.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
-</figure>
-</div>
-<p>O mesmo ocorre quando se filtra por algum contrato, em que haverá o retorno de dados de Crédito Inicial e Autorizado e Cota Aprovada na estrutura orçamentária em que a Execução da Despesa nesse contrato ocorreu.</p>
+<p>Agora cada linha da <code>tabela link</code> contém não apenas uma chave, mas uma para cada conjunto de dimensões existentes em cada tabela.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/linktable_filtro-3.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
+<figcaption class="figure-caption">linktable_filtro-3</figcaption>
 </figure>
 </div>
+<p>Observando-se as tabelas acima é possível verificar o comportamento das tabelas ao se filtrar por alguma dimensão não compartilhada entre todas elas. A <code>tabela link</code>, agora contendo todas chaves em cada linha, é capaz de trazer a métrica de todas as tabelas, até o nível de agregação das dimensões existentes em sua respectiva chave.</p>
+</section>
+</section>
+<section id="conclusão" class="level1">
+<h1>Conclusão</h1>
+<p>Nesta nota foi relatado o método utilizado no relatório operacional qlikview para relacionamento de suas bases. Um forma que se mostra eficaz para que o conjunto de dados hoje existentes no painel respondam adequadamente às consultas dos usuários. Esta solução foi criada a partir do uso prático da ferramenta no dia a dia da rotina orçamentária. Por isso, ainda cabem estudos no sentido de se averiguar a eficiência da modelagem aplicada neste projeto diante do que sugerem as melhores práticas e literatura mais atual no assunto.</p>
 
 
 </section>
-</section>
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>https://decisionworks.com/2003/10/no-detail-too-small/<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>https://www.kimballgroup.com/2003/04/the-soul-of-the-data-warehouse-part-two-drilling-across/<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>https://help.qlik.com/en-US/qlikview/May2023/Subsystems/Client/Content/QV_QlikView/Scripting/synthetic-keys.htm<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
