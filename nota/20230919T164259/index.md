@@ -6,7 +6,7 @@ Para executar um container baseado na [imagem docker da ploa 2024](https://hub.d
 
 
 ```bash
-docker run --rm -ti --mount type=bind,source=$(PWD),target=/home/rstudio volumes:ploa2024 bash
+docker run --rm -p 8787:8787 -ti --mount type=bind,source=$(PWD),target=/home/rstudio volumes:ploa2024 bash
 ```
 
 Dentro do container execute:
@@ -33,6 +33,12 @@ Page rot:       0
 File size:      29704 bytes
 Optimized:      no
 PDF version:    1.5
+```
+
+Inicia sessão do Rstudio em http://localhost:8787/ (usuário: rstudio, senha: splor)
+
+```
+docker exec -d -e PASSWORD=splor volumes-loa /init
 ```
 
 ## Links
