@@ -54,3 +54,6 @@ docker exec -d -e PASSWORD=splor volumes-loa /init
 - [R Manuals :: R Internals - 11  Use of TeX dialects](https://rstudio.github.io/r-manuals/r-ints/Use-of-TeX-dialects.html)
 
     `tools::texi2dvi` makes use of a system command `texi2dvi` where available. On a Unix-alike this is usually part of `texinfo`, whereas on Windows if it exists at all it would be an executable, part of MiKTeX. If none is available, the R code runs a sequence of `(pdf)latex`, `bibtex` and `makeindex` commands.
+
+- Sweave now outputs ‘.tex’ files in UTF-8 if the input encoding is declared to be UTF-8, regardless of the local encoding. The UTF-8 encoding may now be declared using a LaTeX comment containing the string %\SweaveUTF8 on a line by itself.
+
