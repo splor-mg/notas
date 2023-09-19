@@ -176,6 +176,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><a href="https://github.com/rstudio/bookdown/issues/375">Forbidden control sequence found when knitting the minimal example · Issue #375 · rstudio/bookdown</a></p></li>
 <li><p><a href="https://rstudio.github.io/r-manuals/r-ints/Use-of-TeX-dialects.html">R Manuals :: R Internals - 11&nbsp; Use of TeX dialects</a></p>
 <p><code>tools::texi2dvi</code> makes use of a system command <code>texi2dvi</code> where available. On a Unix-alike this is usually part of <code>texinfo</code>, whereas on Windows if it exists at all it would be an executable, part of MiKTeX. If none is available, the R code runs a sequence of <code>(pdf)latex</code>, <code>bibtex</code> and <code>makeindex</code> commands.</p></li>
+<li><p>Sweave now outputs ‘.tex’ files in UTF-8 if the input encoding is declared to be UTF-8, regardless of the local encoding. The UTF-8 encoding may now be declared using a LaTeX comment containing the string % on a line by itself.</p></li>
 </ul>
 
 
