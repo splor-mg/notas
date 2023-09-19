@@ -50,6 +50,7 @@ docker exec -d -e PASSWORD=splor volumes-loa /init
 - [latex - Running xelatex programmatically from R script - Stack Overflow](https://stackoverflow.com/questions/49082874/running-xelatex-programmatically-from-r-script)
 - [tips/tex/tex-tips.Rmd at master · jrminter/tips](https://github.com/jrminter/tips/blob/master/tex/tex-tips.Rmd#L859)
 - [xetex - How to use texi2dvi to run latex generating PDF? - TeX - LaTeX Stack Exchange](https://tex.stackexchange.com/questions/31808/how-to-use-texi2dvi-to-run-latex-generating-pdf)
+- [Forbidden control sequence found when knitting the minimal example · Issue #375 · rstudio/bookdown](https://github.com/rstudio/bookdown/issues/375)
 - [R Manuals :: R Internals - 11  Use of TeX dialects](https://rstudio.github.io/r-manuals/r-ints/Use-of-TeX-dialects.html)
 
     `tools::texi2dvi` makes use of a system command `texi2dvi` where available. On a Unix-alike this is usually part of `texinfo`, whereas on Windows if it exists at all it would be an executable, part of MiKTeX. If none is available, the R code runs a sequence of `(pdf)latex`, `bibtex` and `makeindex` commands.
