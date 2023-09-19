@@ -141,7 +141,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Gerando pdfs com xelatex</h1>
 <p>No arquivo <code>.Rnw</code> foram inseridos <em>non-printable unicode characters</em> obtidos <a href="https://www.soscisurvey.de/tools/view-chars.php">aqui</a>.</p>
 <p>Para executar um container baseado na <a href="https://hub.docker.com/r/fjuniorr/volumes">imagem docker da ploa 2024</a> abra o programa Docker Desktop e depois execute no terminal:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-ti</span> <span class="at">--mount</span> type=bind,source=<span class="va">$(</span><span class="ex">PWD</span><span class="va">)</span>,target=/home/rstudio volumes:ploa2024 bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-p</span> 8787:8787 <span class="at">-ti</span> <span class="at">--mount</span> type=bind,source=<span class="va">$(</span><span class="ex">PWD</span><span class="va">)</span>,target=/home/rstudio volumes:ploa2024 bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Dentro do container execute:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">R</span> CMD Sweave <span class="at">--pdf</span> table.Rnw </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pdfinfo</span> table.pdf </span>
@@ -161,6 +161,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="ex">File</span> size:      29704 bytes</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Optimized:</span>      no</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="ex">PDF</span> version:    1.5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Inicia sessão do Rstudio em http://localhost:8787/ (usuário: rstudio, senha: splor)</p>
+<pre><code>docker exec -d -e PASSWORD=splor volumes-loa /init</code></pre>
 <section id="links" class="level2">
 <h2 class="anchored" data-anchor-id="links">Links</h2>
 <ul>
