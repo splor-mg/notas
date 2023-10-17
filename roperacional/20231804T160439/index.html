@@ -97,7 +97,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -131,7 +131,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução">Introdução</a>
+  <ul class="collapse">
+  <li><a href="#granularidade-das-bases-de-dados" id="toc-granularidade-das-bases-de-dados" class="nav-link" data-scroll-target="#granularidade-das-bases-de-dados">Granularidade das bases de dados</a></li>
+  </ul></li>
+  <li><a href="#empilhamento-de-tabelas-concatenate" id="toc-empilhamento-de-tabelas-concatenate" class="nav-link" data-scroll-target="#empilhamento-de-tabelas-concatenate">Empilhamento de tabelas (Concatenate)</a>
+  <ul class="collapse">
+  <li><a href="#dados" id="toc-dados" class="nav-link" data-scroll-target="#dados">Dados</a></li>
+  <li><a href="#visualizações" id="toc-visualizações" class="nav-link" data-scroll-target="#visualizações">Visualizações</a></li>
+  </ul></li>
+  <li><a href="#sec-linktable" id="toc-sec-linktable" class="nav-link" data-scroll-target="#sec-linktable"><em>Linktable</em> com chave única</a>
+  <ul class="collapse">
+  <li><a href="#método-linktable-com-uma-chave" id="toc-método-linktable-com-uma-chave" class="nav-link" data-scroll-target="#método-linktable-com-uma-chave">Método <em>linktable</em> com uma chave</a>
+  <ul class="collapse">
+  <li><a href="#dados-1" id="toc-dados-1" class="nav-link" data-scroll-target="#dados-1">Dados</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#relacionamento-automático" id="toc-relacionamento-automático" class="nav-link" data-scroll-target="#relacionamento-automático">Relacionamento automático</a>
+  <ul class="collapse">
+  <li><a href="#resultado-do-relacionamento-entre-tabelas-automático" id="toc-resultado-do-relacionamento-entre-tabelas-automático" class="nav-link" data-scroll-target="#resultado-do-relacionamento-entre-tabelas-automático">Resultado do relacionamento entre tabelas automático</a></li>
+  </ul></li>
+  <li><a href="#linktable-com-múltiplas-chaves" id="toc-linktable-com-múltiplas-chaves" class="nav-link" data-scroll-target="#linktable-com-múltiplas-chaves"><em>Linktable</em> com múltiplas chaves</a>
+  <ul class="collapse">
+  <li><a href="#resultado-do-método-linktable-com-múltiplas-chaves" id="toc-resultado-do-método-linktable-com-múltiplas-chaves" class="nav-link" data-scroll-target="#resultado-do-método-linktable-com-múltiplas-chaves">Resultado do método Linktable com múltiplas chaves:</a></li>
+  </ul></li>
+  <li><a href="#conclusão" id="toc-conclusão" class="nav-link" data-scroll-target="#conclusão">Conclusão</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/splor-mg/notas/edit/main/20231804T160439/index.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/splor-mg/notas/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -162,278 +194,383 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Cada projeto exige análise e estudo individualizados. É preciso ter em mente quais perguntas que se buscam responder, entender os processos de negócio, como os dados são gerados, as potencialidades e limitações resultantes dos possíveis cruzamentos entre duas ou mais tabelas fato distintas, para por fim poder dar início a este trabalho. Uma modelagem e relacionamentos entre tabelas incorretos levam necessariamente a resultados igualmente incorretos aos relatórios.</p>
 <p>O objetivo desta nota é lançar luz nesse sentido, apresentando a solução utilizada no painel relatório operacional qlikview na complexa tarefa de se criar uma modelagem e relacionar diferentes tabelas fato. O painel contém relatórios a partir de dados históricos e atualizados dos principais fluxos orçamentários do estado existentes no armazém de informações, universos SIAFI e SIAD, e da restimativa de receitas e despesas, em diferentes níveis de agregação.</p>
 <p>Nas próximas sessões desta nota são apresentados dois métodos de relacionamento entre tabelas, o de <a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pfd">empilhamento ou concatenate</a> das bases, que já era utilizao em outro projeto da SPLOR, o painel da reestimativa da DCAF, comparando seus resultados ao utilizado no relatório operacional, o método <em><a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pdf">linktable</a></em>, a fim de justificar escolha por este último neste projeto.</p>
-</section>
-<section id="as-diferentes-granularidades-das-bases-que-alimentam-o-relatório-operacional-qlikview" class="level1">
-<h1>As diferentes granularidades das bases que alimentam o relatório operacional qlikview:</h1>
+<section id="granularidade-das-bases-de-dados" class="level2">
+<h2 class="anchored" data-anchor-id="granularidade-das-bases-de-dados">Granularidade das bases de dados</h2>
 <p>As diferentes granularidades (dimensões) dos dados do ementário completo de bases utilizadas no projeto do relatório operacional qlikview pode ser verificado no <a href="https://gist.github.com/hslinhares/68a3d06eae13b8facb1df42e1095c49e">data package relatorio operacional</a>.</p>
 <p>Nesta nota, para exemplificação dos métodos de relacionamento entre tabelas, são utilizadas pequenos exemplos fictícios de bases que remontam aos fluxos orçamentários reais de execução de despesas, crédito, restos a pagar e receita. As tabelas a seguir apresentam os dados utilizados.</p>
-<p><strong>Tabela execução de despesas:</strong></p>
-<pre><code>UO_COD GRUPO FONTE ELEMENTO_ITEM EMPENHADO
-1:   1001     3    10          3999       100
-2:   1001     4    60          5101       120</code></pre>
-<p><strong>Tabela crédito:</strong></p>
-<pre><code>UO_COD GRUPO FONTE CREDITO
-1:   1001     3    10    1000
-2:   1001     4    60    1000
-3:   1002     3    60    1000
-4:   1003     3    60    1000</code></pre>
-<p><strong>Tabela restos a pagar:</strong></p>
-<pre><code>   UO_COD GRUPO FONTE ELEMENTO_ITEM RP_PAGO_PROCESSADO
-1:   1001     3    10          3333                100
-2:   1003     3    60          3999                100</code></pre>
-<p><strong>Tabela receita:</strong></p>
-<pre><code>  UO_COD FONTE ARRECADADO
-1:   1001    10        300
-2:   1001    60        300
-3:   1002    60        300
-4:   1003    60        300</code></pre>
-<p>Verificam-se que existem diferentes agregações dos dados entre as tabelas. As bases execução de despesas e restos a pagar contêm a mesma granularidade nos dados entre si (<code>UO_COD</code>, <code>GRUPO</code>, <code>FONTE</code> e <code>ELEMENTO_ITEM</code>), diferente da base crédito que não contém a dimensão <code>ELEMENTO_ITEM</code> e a base receita que somente contém as dimensões <code>UO_COD</code> e <code>FONTE</code>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Tabela receita </caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">UO_COD</th>
+<th style="text-align: right;">FONTE</th>
+<th style="text-align: right;">ARRECADADO</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1001</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">300</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1001</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">300</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1002</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">300</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1003</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">300</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Tabela crédito </caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">UO_COD</th>
+<th style="text-align: right;">GRUPO</th>
+<th style="text-align: right;">FONTE</th>
+<th style="text-align: right;">CREDITO</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1001</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">1000</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1001</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">1000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1002</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">1000</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1003</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">1000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Tabela execução de despesas </caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">UO_COD</th>
+<th style="text-align: right;">GRUPO</th>
+<th style="text-align: right;">FONTE</th>
+<th style="text-align: right;">ELEMENTO_ITEM</th>
+<th style="text-align: right;">EMPENHADO</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1001</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">3999</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1001</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">5101</td>
+<td style="text-align: right;">120</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Tabela restos a pagar </caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">UO_COD</th>
+<th style="text-align: right;">GRUPO</th>
+<th style="text-align: right;">FONTE</th>
+<th style="text-align: right;">ELEMENTO_ITEM</th>
+<th style="text-align: right;">RP_PAGO_PROCESSADO</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1001</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">3333</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1003</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">3999</td>
+<td style="text-align: right;">100</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Verificam-se que existem diferentes agregações dos dados entre as tabelas conforme figura <a href="#fig-bus-matrix">Figure&nbsp;1</a>. As bases execução de despesas e restos a pagar contêm a mesma granularidade nos dados entre si (<code>UO_COD</code>, <code>GRUPO</code>, <code>FONTE</code> e <code>ELEMENTO_ITEM</code>), diferente da base crédito que não contém a dimensão <code>ELEMENTO_ITEM</code> e a base receita que somente contém as dimensões <code>UO_COD</code> e <code>FONTE</code>.</p>
+<div id="fig-bus-matrix" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figuras/bus-matrix.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Kimball enterprise bus matrix</figcaption>
+</figure>
+</div>
 </section>
-<section id="método-de-empilhamento-de-tabelas-função-concatenate-no-qlikview" class="level1">
-<h1>Método de empilhamento de tabelas (função Concatenate) no qlikview:</h1>
-<p>Vale salientar que, o qlikview automaticamente empilha bases com colunas exatamente iguais em nome e quantidade. Quando isto não ocorre, como no exemplo, é necessário forçar o empilhamento por meio da função <code>Concatenate</code>, no <code>Script</code> da ferramenta, conforme se segue:</p>
-<section id="passo-1-leitura-e-empilhamento-das-bases-execução-de-despesas-crédito-restos-a-pagar-e-receita" class="level2">
-<h2 class="anchored" data-anchor-id="passo-1-leitura-e-empilhamento-das-bases-execução-de-despesas-crédito-restos-a-pagar-e-receita">Passo 1: Leitura e empilhamento das bases Execução de Despesas, Crédito, Restos a Pagar e Receita:</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>execucao_despesas:</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>LOAD </span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD, </span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>     DESPESA_EMP</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>FROM</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>[data\execucao.xlsx]</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>credito:</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>     CREDITO</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>FROM</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>[data-raw\credito.xlsx]</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>restos_a_pagar:</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD,</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>     PAGO_PROCESSADO</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>FROM</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>[data-raw\restos_a_pagar.xlsx]</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>Concatenate:</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>receita:</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>LOAD UO_COD, </span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>     FONTE, </span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>     ARRECADADO</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>FROM</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>[data\receita.xlsx]</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="resultado-do-método-de-empilhamento" class="level2">
-<h2 class="anchored" data-anchor-id="resultado-do-método-de-empilhamento">Resultado do método de empilhamento</h2>
-<p>Após a leitura dos dados, e o resultado será uma única tabela de dados empilhada, que pode ser verificada por meio do comando <code>ctrl T</code>.</p>
+<section id="empilhamento-de-tabelas-concatenate" class="level1">
+<h1>Empilhamento de tabelas (Concatenate)</h1>
+<p>O qlikview automaticamente empilha bases com colunas idênticas em nome e quantidade. Quando isto não ocorre, como no exemplo, é necessário forçar o empilhamento por meio da função <code>Concatenate</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>execucao_despesas:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD, </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>     DESPESA_EMP</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>[data\execucao.xlsx]</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>credito:</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>     CREDITO</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>[data-raw\credito.xlsx]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>restos_a_pagar:</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>     GRUPO_COD, </span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>     FONTE_COD, </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM_COD,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>     PAGO_PROCESSADO</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>[data-raw\restos_a_pagar.xlsx]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>Concatenate:</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>receita:</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>LOAD UO_COD, </span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>     FONTE, </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>     ARRECADADO</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>[data\receita.xlsx]</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="dados" class="level2">
+<h2 class="anchored" data-anchor-id="dados">Dados</h2>
+<p>Após a leitura dos dados, e o resultado será uma única tabela de dados empilhada, que pode ser verificada por meio do comando <code>ctrl T</code>:</p>
+<div id="fig-elephants" class="quarto-layout-panel">
+<figure class="figure">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/base_empilhada.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
+<figcaption class="figure-caption">Schema base empilhada</figcaption>
 </figure>
 </div>
-<p>Clicando com o botão direito sobre esta tabela acima é possível se verificar o conteúdo da tabela empilhada:</p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/dados_base_empilhada.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">dados base empilhada</figcaption>
+<figcaption class="figure-caption">Dados base empilhada</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2: Base empilhada</figcaption><p></p>
 </figure>
 </div>
 <p>Observa-se que a tabela empilhada contém todas as colunas de suas tabelas de origem. E nas linhas correspondentes a dados de uma determinada tabela, onde inexista alguma coluna da tabela empilhada, o seu valor retorna nulo. Por exemplo, a última linha corresponde a dados da tabela receita, em que há dados somente para <code>UO</code> e <code>FONTE</code>, restando nulo todas as demais colunas.</p>
-<p>Com o dados corretamente empilhados podem ser construídos relatórios na ferramenta.</p>
+<p>Com os dados corretamente empilhados podem ser construídos relatórios na ferramenta.</p>
 </section>
-<section id="criação-de-dashboards-para-visualização-dos-dados-método-de-empilhamento-das-bases-concatenate" class="level2">
-<h2 class="anchored" data-anchor-id="criação-de-dashboards-para-visualização-dos-dados-método-de-empilhamento-das-bases-concatenate">Criação de <em>dashboards</em> para visualização dos dados método de empilhamento das bases (Concatenate):</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figuras/concatenate_painel.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">concatenate_painel</figcaption>
-</figure>
-</div>
+<section id="visualizações" class="level2">
+<h2 class="anchored" data-anchor-id="visualizações">Visualizações</h2>
 <p>Com as bases lidas, dentro no ambiente de aba de criação de <em>dashboards</em> no qlikview, o próximo passo é inserir <code>Novo Objeto de Pasta</code> do tipo <code>Lista</code> para objetos de filtro e <code>Gráfico</code>/<code>Tabela Simples</code> para criação da Tabela com os dados desejados.</p>
 <p>No nosso exemplo, construímos uma tabela contendo <code>UO_COD</code> e <code>FONTE</code> como dimensões, e as métricas de todos os processos orçamentários.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="figuras/concatenate_filtro-1.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">concatenate_filtro-1</figcaption>
+<p><img src="figuras/concatenate_painel.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Painel Concatenado</figcaption>
 </figure>
 </div>
 <p>Filtrando-se por dimensões existentes em todas as bases, por exemplo, <code>FONTE</code>, a tabela retorna as medidas existentes agrupadas nesta dimensão no valor selecionado.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="figuras/concatenate_filtro-2.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">concatenate_filtro-2</figcaption>
+<p><img src="figuras/concatenate_filtro-1.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Filtro fonte de recurso</figcaption>
 </figure>
 </div>
-<p>Entretanto, quando se filtra por alguma dimensão inexistente em alguma das bases, suas métricas retornam nulo. Como exemplo, ao se filtrar por <code>ELEMENTO_ITEM</code> <code>3999</code>, os dados <code>CREDITO</code> e <code>ARRECADADO</code>retornam zero (Como <em>default</em> o qlikview converte dados nulos em zero nos relatórios).</p>
-<p>Com base na tabela resultante do empilhamento das bases, o resultado do filtro está de acordo com o esperado, uma vez que, de fato, inexiste a dimensão<code>ELEMENTO_ITEM</code> nas tabelas crédito e receita.</p>
-<p>Contudo, o resultado desejado para uso na SPLOR é que ao se filtrar por <code>ELEMENTO_ITEM</code> <code>3999</code>, o painel também retorne valores de <code>CREDITO</code> e <code>RECEITA</code> no nível agregação compartilhada entre as bases. Ou seja, como neste <code>ELEMENTO_ITEM</code> ocorreu execução de despesas (empenho e pagamento de RP) na <code>UO_COD</code> <code>1001</code>e <code>1003</code>, <code>GRUPO</code> <code>3</code>,<code>FONTE</code> <code>10</code> e <code>60</code>, o painel deve retornar o total <code>ARRECADADO</code> nessas UOs e fontes, e da base crédito o valor do <code>CREDITO</code> dessas UOs, fontes e grupo de despesa.</p>
+<p>Entretanto, quando se filtra por alguma dimensão inexistente em alguma das bases, suas métricas retornam nulo. Como exemplo, ao se filtrar por <code>ELEMENTO_ITEM</code> <code>3999</code>, os dados <code>CREDITO</code> e <code>ARRECADADO</code> retornam zero (Como <em>default</em> o qlikview converte dados nulos em zero nos relatórios).</p>
+<p>Com base na tabela resultante do empilhamento das bases, o resultado do filtro está de acordo com o esperado, uma vez que, de fato, inexiste a dimensão <code>ELEMENTO_ITEM</code> nas tabelas crédito e receita.</p>
+<p>Contudo, o resultado desejado para uso na SPLOR é que ao se filtrar por <code>ELEMENTO_ITEM</code> <code>3999</code>, o painel também retorne valores de <code>CREDITO</code> e <code>RECEITA</code> no nível agregação compartilhada entre as bases. Ou seja, como neste <code>ELEMENTO_ITEM</code> ocorreu execução de despesas (empenho e pagamento de RP) na <code>UO_COD</code> <code>1001</code> e <code>1003</code>, <code>GRUPO</code> <code>3</code>, <code>FONTE</code> <code>10</code> e <code>60</code>, o painel deve retornar o total <code>ARRECADADO</code> nessas UOs e fontes, e da base crédito o valor do <code>CREDITO</code> dessas UOs, fontes e grupo de despesa.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/concatenate_filtro-2.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Filtro elemento item</figcaption>
+</figure>
+</div>
 <p>No painel relatorio operacional qlikview esta solução foi atingida a partir de uma adaptação ao método <a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pdf">linktable</a> de relacionamento de bases demonstrada a seguir.</p>
 </section>
 </section>
-<section id="método-linktable-ou-tabela-link" class="level1">
-<h1>Método <em>linktable</em> ou tabela Link:</h1>
-<p>O método de relacionamento <em><a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pdf">linktable</a></em> consiste empilhar em uma única tabela, chamada <code>tabela link</code> ou <em><code>linktable</code></em>,todas as variáveis em comum de todas as tabelas fato. No exemplo, <code>UO</code>, <code>GRUPO</code>, <code>FONTE</code>, e <code>ELEMENTO_ITEM</code>, e criar nesta tabela a coluna chave, resultado da concatenação dos valores das outras demais colunas.</p>
+<section id="sec-linktable" class="level1">
+<h1><em>Linktable</em> com chave única</h1>
+<p>O método de relacionamento <em><a href="QlikView_Technical_Brief-Concatenate-and-Link-tables.pdf">linktable</a></em> consiste empilhar em uma única tabela, chamada <code>tabela link</code> ou <em><code>linktable</code></em>, todas as variáveis em comum de todas as tabelas fato. No exemplo, <code>UO</code>, <code>GRUPO</code>, <code>FONTE</code>, e <code>ELEMENTO_ITEM</code>, e criar nesta tabela a coluna chave, resultado da concatenação dos valores das outras demais colunas.</p>
 <p>Esta coluna chave também deve ser criada em cada uma das tabela fato, onde devem restar somente esta coluna e suas respectivas métricas (<code>CREDITO</code>, <code>EMPENHADO</code>, <code>PAGO_PROCESSADO</code> e <code>ARRECADADO</code>), e por meio da qual será feita a ligação com a <code>tabela link</code>.</p>
-</section>
-<section id="método-linktable-com-uma-chave" class="level1">
-<h1>Método <em>linktable</em> com uma chave:</h1>
-<section id="passo-1-criar-nas-tabelas-fato-uma-coluna-chave-correspondente-ao-seu-conjunto-de-dimensões-deixando-para-leitura-somente-esta-chave-e-a-métrica." class="level2">
-<h2 class="anchored" data-anchor-id="passo-1-criar-nas-tabelas-fato-uma-coluna-chave-correspondente-ao-seu-conjunto-de-dimensões-deixando-para-leitura-somente-esta-chave-e-a-métrica.">Passo 1: criar nas tabelas fato uma coluna chave correspondente ao seu conjunto de dimensões, deixando para leitura somente esta chave e a métrica.</h2>
-<pre><code>//Cria a chave na tabela fato de Despesa Empenhada e torna as variavéis dimensão como comentário no Script
-
-execucao_despesas:
-LOAD 
-UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave,
-LOAD 
-     //UO_COD, 
-     //GRUPO_COD, 
-     //FONTE_COD, 
-     //ELEMENTO_ITEM_COD, 
-     DESPESA_EMP
-FROM
-[data\execucao.xlsx]
-(ooxml, embedded labels, table is base);</code></pre>
-<pre><code>//Cria a chave na tabela fato de Restos a Pagar e torna as variavéis dimensão como comentário no Script
-
-restos_a_pagar:
-LOAD  
-UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave,
-     //UO_COD, 
-     //GRUPO_COD, 
-     //FONTE_COD, 
-     //ELEMENTO_ITEM_COD,
-     PAGO_PROCESSADO
-FROM
-[data-raw\restos_a_pagar.xlsx]
-(ooxml, embedded labels, table is base);
-</code></pre>
-<pre><code>//Cria a chave na tabela fato Crédito e torna as variavéis dimensão como comentário no Script
-credito:
-UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD as chave
-LOAD  
-    // UO_COD, 
-    // GRUPO_COD, 
-    // FONTE_COD, 
-     CREDITO
-FROM
-[data-raw\credito.xlsx]
-(ooxml, embedded labels, table is base);</code></pre>
-<pre><code>//Cria a chave na tabela fato Receita e torna as variavéis dimensão como comentário no Script
-receita3:
-LOAD 
-UO_COD&amp;'|'&amp;FONTE as chave,
-//UO_COD, 
-     //FONTE, 
-     ARRECADADO
-FROM
-[data\receita.xlsx]
-(ooxml, embedded labels, table is base);</code></pre>
-</section>
-<section id="passo-2-criar-a-tabela-link-empilhando-todas-as-dimensões-e-coluna-chave-das-tabelas-fato.-e-utilizar-a-função-distinct-para-retirar-linhas-duplicadas." class="level2">
-<h2 class="anchored" data-anchor-id="passo-2-criar-a-tabela-link-empilhando-todas-as-dimensões-e-coluna-chave-das-tabelas-fato.-e-utilizar-a-função-distinct-para-retirar-linhas-duplicadas.">Passo 2: criar a tabela link empilhando todas as dimensões e coluna chave das tabelas fato. E utilizar a função <code>distinct</code> para retirar linhas duplicadas.</h2>
-<pre><code>//cria a tabela link contendo todas as dimensões de todas as bases e cria chave para comunicar com as tabelas fato
-//
-link:
-LOAD 
-Distinct
-UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave,
-    UO_COD, 
-    GRUPO, 
-    FONTE, 
-    ELEMENTO_ITEM
-     //EMPENHADO
-FROM
-[data\execucao.xlsx]
-(ooxml, embedded labels, table is base);
-
-Concatenate
-
-LOAD
-Distinct
-UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave,
-    UO_COD, 
-    GRUPO, 
-    FONTE, 
-     ELEMENTO_ITEM
-     //RP_PAGO_PROCESSADO
-FROM
-[data\restos_a_pagar.xlsx]
-(ooxml, embedded labels, table is base);
-
-Concatenate
-
-LOAD 
-Distinct
-UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave, 
-    UO_COD, 
-    GRUPO, 
-    FONTE
-   /// CREDITO
-FROM
-[data\credito.xlsx]
-(ooxml, embedded labels, table is base);
-
-Concatenate
-
-LOAD 
-Distinct
-null() as chave1,
-null () as chave2,
-UO_COD&amp;'|'&amp;FONTE as chave3, 
-UO_COD,
-FONTE
-//ARRECADADO
-FROM
-[data\receita.xlsx]
-(ooxml, embedded labels, table is base)</code></pre>
-</section>
-<section id="resultado-do-método-linktable-com-uma-chave" class="level2">
-<h2 class="anchored" data-anchor-id="resultado-do-método-linktable-com-uma-chave">Resultado do método <em>Linktable</em> com uma chave:</h2>
+<section id="método-linktable-com-uma-chave" class="level2">
+<h2 class="anchored" data-anchor-id="método-linktable-com-uma-chave">Método <em>linktable</em> com uma chave</h2>
+<p>O primeiro passo é criar nas tabelas fato uma coluna chave correspondente ao seu conjunto de dimensões, deixando para leitura somente esta chave e a métrica.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>execucao_despesas:</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     DESPESA_EMP</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>[data\execucao.xlsx]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>restos_a_pagar:</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>     PAGO_PROCESSADO</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>[data-raw\restos_a_pagar.xlsx]</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>credito:</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD as chave</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>     CREDITO</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>[data-raw\credito.xlsx]</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>receita:</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;FONTE as chave,</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>     ARRECADADO</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>[data\receita.xlsx]</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>O segundo passo é criar a tabela link empilhando todas as dimensões e coluna chave (para permitir a comunicação com as tabelas fato) e utilizar a função <code>distinct</code> para retirar linhas duplicadas.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>link:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Distinct</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    UO_COD, </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    GRUPO, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    FONTE, </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    ELEMENTO_ITEM</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>[data\execucao.xlsx]</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>LOAD</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>Distinct</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave,</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    UO_COD, </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    GRUPO, </span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    FONTE, </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    ELEMENTO_ITEM</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>[data\restos_a_pagar.xlsx]</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>Distinct</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave, </span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    UO_COD, </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    GRUPO, </span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    FONTE</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>[data\credito.xlsx]</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>Distinct</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;FONTE as chave, </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>     UO_COD,</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>     FONTE</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>[data\receita.xlsx]</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="dados-1" class="level3">
+<h3 class="anchored" data-anchor-id="dados-1">Dados</h3>
+<p>Conforme imagem do modelo dimensional, diferente do método de empilhamento, o método linktable preserva as tabelas fato com suas métricas, ligadas por uma chave à tabela de ligação.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/linktable-1.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">linktable-1</figcaption>
-</figure>
-</div>
-<p>Conforme imagem do modelo dimensional acima, diferente do método de empilhamento, o método linktable preserva as tabelas fato com suas métricas, ligadas por uma chave à tabela de ligação.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="figuras/dados_linktable.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">dados_linktable</figcaption>
+<figcaption class="figure-caption">Schema modelagem linktable</figcaption>
 </figure>
 </div>
 <p>Observando-se os dados armazenados nas tabelas, verifica-se que em cada linha na <code>tabela link</code> existe uma chave corresponde a uma linha em um das tabelas fato. Mas poderia, se fosse o caso, ser também uma relação um para muitos.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="figuras/dados_linktable3.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">dados_linktable3</figcaption>
+<p><img src="figuras/dados_linktable.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Dados modelagem linktable</figcaption>
 </figure>
 </div>
 <p>Ao se filtrar pela dimensão <code>ELEMENTO_ITEM</code> <code>3999</code>, o resultado foi o mesmo que ao do método de <code>empilhamento</code> das tabelas. Ou seja, os valores das tabelas crédito e receita retornaram nulos. Isto porque em suas chaves não existe esta dimensão.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/dados_linktable3.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Filtro modelagem linktable</figcaption>
+</figure>
+</div>
 <p>O caminho seguido para se obter o resultado esperado dos filtros foi observando o <code>modo automático</code> do qlikiview, que cria uma espécie de <code>tabela link com várias chaves</code>, uma para cada conjunto de dimensões, conforme tópico a seguir.</p>
 </section>
 </section>
-<section id="relacionamento-entre-tabelas-automático-no-qlikview" class="level1">
-<h1>Relacionamento entre tabelas automático no qlikview</h1>
+</section>
+<section id="relacionamento-automático" class="level1">
+<h1>Relacionamento automático</h1>
 <p>É importante saber que o qlikview busca automaticamente empilhar bases com colunas do mesmo nome, ou caso sejam diferentes, criar uma espécie de tabela de ligação e chaves sintéticas. Esta solução apesar de disponível e muito utilizada por iniciantes, não é recomendada pelo próprio fabricante<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>, por eventualmente levar a resultados corretos e referências circulares, não se ter controle da modelagem e por consumir mais recursos computacionais, principalmente na existência de grandes e diversas tabelas fato.</p>
 <p>Porém, para poucas tabelas como no exemplo, a sua utilização é didática para entender o resultado gerado.</p>
 <section id="resultado-do-relacionamento-entre-tabelas-automático" class="level2">
@@ -455,145 +592,130 @@ FROM
 <p>O que observou-se no comportamento automático é que são criadas uma chave para cada conjunto de dimensões existentes na tabela fato. Deste modo as tabelas passam a responder ao filtro como desejado. Retornando o dado de cada uma delas no nível de agregação compartilhado com as demais.</p>
 </section>
 </section>
-<section id="construção-do-método-linktable-no-qlikview-com-multiplas-chaves" class="level1">
-<h1>Construção do método linktable no qlikview com multiplas chaves:</h1>
+<section id="linktable-com-múltiplas-chaves" class="level1">
+<h1><em>Linktable</em> com múltiplas chaves</h1>
 <p>A estratégia adotada no relatório operacional foi recriar a estrutura do modo automático mostrado anteriormente, porém por meio de comandos ao <code>qlikview</code>, a fim de se ter controle na ferramenta do modelo de dados e se evitar todos os problemas desta função.</p>
-<section id="passo-1-criar-nas-tabelas-fato-uma-coluna-chave-específica-correspondente-a-cada-conjunto-de-dimensões-deixando-para-leitura-somente-esta-chave-e-a-métrica." class="level2">
-<h2 class="anchored" data-anchor-id="passo-1-criar-nas-tabelas-fato-uma-coluna-chave-específica-correspondente-a-cada-conjunto-de-dimensões-deixando-para-leitura-somente-esta-chave-e-a-métrica.">Passo 1: criar nas tabelas fato uma coluna chave específica correspondente a cada conjunto de dimensões, deixando para leitura somente esta chave e a métrica.</h2>
-<pre><code>//Cria a chave na tabela fato de Despesa Empenhada e torna as variavéis dimensão como comentário no Script
-
-execucao_despesas:
-LOAD 
-UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave1,
-LOAD 
-     //UO_COD, 
-     //GRUPO_COD, 
-     //FONTE_COD, 
-     //ELEMENTO_ITEM_COD, 
-     DESPESA_EMP
-FROM
-[data\execucao.xlsx]
-(ooxml, embedded labels, table is base);</code></pre>
-<pre><code>//Cria a chave na tabela fato de Restos a Pagar e torna as variavéis dimensão como comentário no Script
-
-restos_a_pagar:
-LOAD  
-UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave1,
-     //UO_COD, 
-     //GRUPO_COD, 
-     //FONTE_COD, 
-     //ELEMENTO_ITEM_COD,
-     PAGO_PROCESSADO
-FROM
-[data-raw\restos_a_pagar.xlsx]
-(ooxml, embedded labels, table is base);
-</code></pre>
-<pre><code>//Cria a chave na tabela fato Crédito e torna as variavéis dimensão como comentário no Script
-credito:
-UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD as chave2
-LOAD  
-    // UO_COD, 
-    // GRUPO_COD, 
-    // FONTE_COD, 
-     CREDITO
-FROM
-[data-raw\credito.xlsx]
-(ooxml, embedded labels, table is base);</code></pre>
-<pre><code>//Cria a chave na tabela fato Receita e torna as variavéis dimensão como comentário no Script
-receita3:
-LOAD 
-UO_COD&amp;'|'&amp;FONTE as chave,
-//UO_COD, 
-     //FONTE, 
-     ARRECADADO
-FROM
-[data\receita.xlsx]
-(ooxml, embedded labels, table is base);</code></pre>
-</section>
-<section id="passo-2-criar-tabela-link-empilhando-todas-as-chaves-e-dimensões-das-tabelas-fato.-utilizar-a-função-distinct-para-retirar-linhas-duplicadas." class="level2">
-<h2 class="anchored" data-anchor-id="passo-2-criar-tabela-link-empilhando-todas-as-chaves-e-dimensões-das-tabelas-fato.-utilizar-a-função-distinct-para-retirar-linhas-duplicadas.">Passo 2: criar tabela link empilhando todas as chaves e dimensões das tabelas fato. Utilizar a função <code>distinct</code> para retirar linhas duplicadas.</h2>
-<pre><code>//cria a tabela link contendo todas as dimensões de todas as bases e cria chave para comunicar com as tabelas fato
-//
-link:
-LOAD 
-Distinct
-UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave1,
-UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave2, 
-UO_COD&amp;'|'&amp;FONTE as chave3,
-    UO_COD, 
-    GRUPO, 
-    FONTE, 
-    ELEMENTO_ITEM
-     //EMPENHADO
-FROM
-[data\execucao.xlsx]
-(ooxml, embedded labels, table is base);
-
-Concatenate
-
-LOAD
-Distinct
-UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave1,
-UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave2, 
-UO_COD&amp;'|'&amp;FONTE as chave3,
-    UO_COD, 
-    GRUPO, 
-    FONTE, 
-     ELEMENTO_ITEM
-     //RP_PAGO_PROCESSADO
-FROM
-[data\restos_a_pagar.xlsx]
-(ooxml, embedded labels, table is base);
-
-Concatenate
-
-LOAD 
-Distinct
-null() as chave1,
-UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave2, 
-UO_COD&amp;'|'&amp;FONTE as chave3, 
-    UO_COD, 
-    GRUPO, 
-    FONTE
-   /// CREDITO
-FROM
-[data\credito.xlsx]
-(ooxml, embedded labels, table is base);
-
-Concatenate
-
-LOAD 
-Distinct
-null() as chave1,
-null () as chave2,
-UO_COD&amp;'|'&amp;FONTE as chave3, 
-UO_COD,
-FONTE
-//ARRECADADO
-FROM
-[data\receita.xlsx]
-(ooxml, embedded labels, table is base)</code></pre>
-</section>
+<p>O primeiro passo 1 é criar nas tabelas fato uma coluna chave específica correspondente a cada conjunto de dimensões, deixando para leitura somente esta chave e a métrica.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>execucao_despesas:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave1,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>     DESPESA_EMP</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>[data\execucao.xlsx]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>restos_a_pagar:</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave1,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>     PAGO_PROCESSADO</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>[data-raw\restos_a_pagar.xlsx]</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>credito:</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>LOAD  </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD as chave2</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>     CREDITO</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>[data-raw\credito.xlsx]</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>receita:</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;FONTE as chave3,</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>     ARRECADADO</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>[data\receita.xlsx]</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A diferença entre esse script e aquele apresentado em <a href="#sec-linktable">Section&nbsp;3</a> é que chaves com granularidades distintas devem possuir nomes diferentes.</p>
+</div>
+</div>
+<p>O segundo passo é criar a tabela link empilhando todas as chaves e dimensões das tabelas fato utilizando a função <code>distinct</code> para retirar linhas duplicadas:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>link:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>Distinct</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave1,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave2, </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;FONTE as chave3,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>     GRUPO, </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>     FONTE, </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>[data\execucao.xlsx]</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>LOAD</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>Distinct</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE&amp;'|'&amp;ELEMENTO_ITEM as chave1,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave2, </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;FONTE as chave3,</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>     GRUPO, </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>     FONTE, </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>     ELEMENTO_ITEM</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>[data\restos_a_pagar.xlsx]</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>Distinct</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>     null() as chave1,</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO&amp;'|'&amp;FONTE as chave2, </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;FONTE as chave3, </span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>     UO_COD, </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>     GRUPO, </span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>     FONTE</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>[data\credito.xlsx]</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base);</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>Concatenate</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>LOAD </span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>Distinct</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>     null() as chave1,</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>     null() as chave2,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;FONTE as chave3, </span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>     UO_COD,</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>     FONTE</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>FROM</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>[data\receita.xlsx]</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>(ooxml, embedded labels, table is base)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="resultado-do-método-linktable-com-múltiplas-chaves" class="level2">
 <h2 class="anchored" data-anchor-id="resultado-do-método-linktable-com-múltiplas-chaves">Resultado do método Linktable com múltiplas chaves:</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/linktable-2.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">linktable-2</figcaption>
+<figcaption class="figure-caption">Schema modelagem linktable com múltiplas chaves</figcaption>
 </figure>
 </div>
 <p>O resultado foi a tabela tabela de ligação ligadas a cada uma das tabelas por meio de chaves específicas para cada uma delas.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/dados_linktable2.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">base empilhada</figcaption>
+<figcaption class="figure-caption">Dados modelagem linktable com múltiplas chaves</figcaption>
 </figure>
 </div>
 <p>Agora cada linha da <code>tabela link</code> contém não apenas uma chave, mas uma para cada conjunto de dimensões existentes em cada tabela.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figuras/linktable_filtro-3.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">linktable_filtro-3</figcaption>
+<figcaption class="figure-caption">Filtro modelagem linktable com múltiplas chaves</figcaption>
 </figure>
 </div>
 <p>Observando-se as tabelas acima é possível verificar o comportamento das tabelas ao se filtrar por alguma dimensão não compartilhada entre todas elas. A <code>tabela link</code>, agora contendo todas chaves em cada linha, é capaz de trazer a métrica de todas as tabelas, até o nível de agregação das dimensões existentes em sua respectiva chave.</p>
@@ -852,4 +974,4 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/splor-mg/notas/edit/main/20231804T160439/index.md" class="toc-action">Edit this page</a></p><p><a href="https://github.com/splor-mg/notas/issues/new" class="toc-action">Report an issue</a></p></div></div></div></div></footer></body></html>
+</body></html>
