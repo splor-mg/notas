@@ -300,9 +300,10 @@ O que observou-se no comportamento automático é que são criadas uma chave par
 
 # _Linktable_ com múltiplas chaves
 
-A estratégia adotada no relatório operacional foi recriar a estrutura do modo automático mostrado anteriormente, porém por meio de comandos ao `qlikview`, a fim de se ter controle na ferramenta do modelo de dados e se evitar todos os problemas desta função.
+A estratégia adotada no relatório operacional foi recriar a estrutura do modo automático mostrado anteriormente, porém por meio de comandos ao `qlikview`, a fim de se ter controle na ferramenta do modelo de dados e se evitar todos os problemas desta função. 
+Em resumo o método consite em empilhar na *`linktable`* todas as dimensões em comum ao subconjunto de pelo menos duas tabelas fato, e em seguida criam-se na colunas na `tabela link` contendo chaves específicas para combinação de dimensões pertencente a cada subconjunto.  
 
-O primeiro passo 1 é criar nas tabelas fato uma coluna chave específica correspondente a cada conjunto de dimensões, deixando para leitura somente esta chave e a métrica.
+Passo 1: Criar em cada uma das tabela fato uma coluna com a chave específica correspondente ao seu conjunto de dimensões em comum a uma ou mais tabelas, deixando para leitura somente a chave criada e a métrica.
 
 ```default
 execucao_despesas:
