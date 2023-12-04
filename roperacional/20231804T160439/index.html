@@ -594,8 +594,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="linktable-com-múltiplas-chaves" class="level1">
 <h1><em>Linktable</em> com múltiplas chaves</h1>
-<p>A estratégia adotada no relatório operacional foi recriar a estrutura do modo automático mostrado anteriormente, porém por meio de comandos ao <code>qlikview</code>, a fim de se ter controle na ferramenta do modelo de dados e se evitar todos os problemas desta função.</p>
-<p>O primeiro passo 1 é criar nas tabelas fato uma coluna chave específica correspondente a cada conjunto de dimensões, deixando para leitura somente esta chave e a métrica.</p>
+<p>A estratégia adotada no relatório operacional foi recriar a estrutura do modo automático mostrado anteriormente, porém por meio de comandos ao <code>qlikview</code>, a fim de se ter controle na ferramenta do modelo de dados e se evitar todos os problemas desta função. Em resumo o método consite em empilhar na <em><code>linktable</code></em> todas as dimensões em comum ao subconjunto de pelo menos duas tabelas fato, e em seguida criam-se na colunas na <code>tabela link</code> contendo chaves específicas para combinação de dimensões pertencente a cada subconjunto.</p>
+<p>Passo 1: Criar em cada uma das tabela fato uma coluna com a chave específica correspondente ao seu conjunto de dimensões em comum a uma ou mais tabelas, deixando para leitura somente a chave criada e a métrica.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>execucao_despesas:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>LOAD </span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>     UO_COD&amp;'|'&amp;GRUPO_COD&amp;'|'&amp;FONTE_COD&amp;'|'&amp;ELEMENTO_ITEM_COD as chave1,</span>
