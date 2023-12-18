@@ -1,0 +1,36 @@
+{
+  "valid": true,
+  "stats": {
+    "tasks": 1,
+    "errors": 0,
+    "warnings": 0,
+    "seconds": 0.009
+  },
+  "warnings": [],
+  "errors": [],
+  "tasks": [
+    {
+      "name": "estados",
+      "type": "table",
+      "valid": true,
+      "place": "data/estados.csv",
+      "labels": [
+        "COD",
+        "NOME",
+        "SIGLA"
+      ],
+      "stats": {
+        "errors": 0,
+        "warnings": 0,
+        "seconds": 0.008,
+        "md5": "99167485b6ca41cfa6a97dc8bdf39fa1",
+        "sha256": "c280dab2e21da93be52aef5a4c934abdd4d70d9981f59372e3f36f4ca8b1ac38",
+        "bytes": 496,
+        "fields": 3,
+        "rows": 27
+      },
+      "warnings": [],
+      "errors": []
+    }
+  ]
+}
