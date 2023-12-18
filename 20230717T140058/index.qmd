@@ -1,0 +1,153 @@
+---
+title: Generator function e Generator iterator na propriedade data de recursos no frictionless
+author: Francisco
+date: 2023-07-17
+---
+
+Usualmente recursos são criados com a propriedade `path`:
+
+```{python}
+from frictionless import Resource
+from rich import print_json
+from rich import print as rprint
+
+resource = Resource(name = 'my-resource', path = 'data.csv')
+print_json(data = resource.read_rows())
+```
+
+No entanto, eles também podem ser criados com a propriedade `data`[^20230717T141158]
+
+[^20230717T141158]: De acordo com a [especificação](https://specs.frictionlessdata.io/data-resource/#data-location):
+
+    > A resource MUST contain a property describing the location of the  
+    > data associated to the resource. The location of resource data MUST be  
+    > specified by the presence of one (and only one) of these two properties:
+    > 
+    > - `path`: for data in files located online or locally on disk.
+    > - `data`: for data inline in the descriptor itself.
+    
+    Cabe ressaltar que além de uma lista de listas também é possível utilizar uma lista de dicionários no argumento `data`:
+
+    > JSON Tabular Data MUST be an `array` where each item in the array MUST be:
+    > 
+    > - EITHER: an array where each entry in the array is the value for that cell in the table
+    > - OR: an object where each key corresponds to the header for that row and the value corresponds to the cell value for that row for that header
+    > 
+    > __Row Arrays__
+    > 
+    > ```
+    > [
+    >   [ "A", "B", "C" ],
+    >   [ 1, 2, 3 ],
+    >   [ 4, 5, 6 ]
+    > ]
+    > ```
+    > 
+    > __Row Objects__
+    > 
+    > ```
+    > [
+    >   { "A": 1, "B": 2, "C": 3 },
+    >   { "A": 4, "B": 5, "C": 6 }
+    > ]
+    > ```
+
+```{python}
+data = [
+    ['a', 'b'],
+    [1, 2],
+    [3, 4],
+]
+
+resource = Resource(name = 'my-resource', data = data)
+print_json(data = resource.read_rows())
+```
+
+mas não com as duas
+
+```{python}
+data = [
+    ['a', 'b'],
+    [1, 2],
+    [3, 4],
+]
+
+resource = Resource(name = 'my-resource', path = 'data.csv', data = data)
+rprint(resource.validate())
+```
+
+## Generator function e generator iterator
+
+A propriedade `data` também aceita um __generator iterator__, mas nesse caso o método `resource.read_rows` vai seguir o comportamento padrão de _iterators_[^20230717T144205] e na segunda chamada não irá retornar linhas:
+
+[^20230717T144205]: Iteradores são _consumidos_ quando você solicita itens deles. Iteradores que foram totalmente consumidos são às vezes chamados de _esgotados_.
+
+```{python}
+data = (row for row in data)
+
+resource = Resource(name = 'my-resource', data = data)
+print_json(data = resource.read_rows())
+```
+
+
+```{python}
+print_json(data = resource.read_rows())
+```
+
+Para evitar a exaustão devemos passar como argumento para a função `data` um __generator__. As definições do [glossário do Python](https://docs.python.org/3.9/glossary.html) esclarem a diferença:
+
+> __generator__
+> 
+> A function which returns a generator iterator. It looks like a normal function except that it contains yield expressions for producing a series of values usable in a for-loop or that can be retrieved one at a time with the next() function.
+> 
+> Usually refers to a generator function, but may refer to a generator iterator in some contexts. In cases where the intended meaning isn’t clear, using the full terms avoids ambiguity.
+
+> __generator iterator__
+> 
+> An object created by a generator function.
+> 
+> Each yield temporarily suspends processing, remembering the location execution state (including local variables and pending try-statements). When the generator iterator resumes, it picks up where it left off (in contrast to functions which start fresh on every invocation).
+
+Ou seja, o seguinte exemplo funciona:
+
+```{python}
+def data():
+    yield ['a', 'b']
+    yield [1, 2]
+    yield [3, 4]
+```
+
+```{python}
+resource = Resource(name = 'my-resource', data = data)
+print_json(data = resource.read_rows())
+```
+
+
+```{python}
+print_json(data = resource.read_rows())
+```
+
+Mas se passarmos o __generator iterator__ `data()` teremos problemas:
+
+```{python}
+def data():
+    yield ['a', 'b']
+    yield [1, 2]
+    yield [3, 4]
+```
+
+```{python}
+resource = Resource(name = 'my-resource', data = data())
+print_json(data = resource.read_rows())
+```
+
+
+```{python}
+print_json(data = resource.read_rows())
+```
+
+## Custom steps
+
+Esse mesmo comportamento também ocorre durante a criação de [custom steps](https://framework.frictionlessdata.io/docs/guides/transforming-data.html#custom-steps) para serem utilizados com o [`frictionless transform`](https://framework.frictionlessdata.io/docs/guides/transforming-data.html):
+
+![](20230717T145248.png)
